@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Card, CardContent } from "@/components/ui/card"
-import { formatTimeAgo } from "@/lib/utils"
+import { formatTimeAgo } from "@/lib/postUtils"
 
 interface InlineCommentSectionProps {
   parentId: string

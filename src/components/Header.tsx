@@ -76,7 +76,7 @@ export default function Header() {
         <div className="flex items-center gap-6 md:gap-8">
           <Link href="/" className="flex items-center gap-2">
             <ChatsIcon className="h-6 w-6 text-blue-600" weight="fill" />
-            <span className="text-xl font-extrabold tracking-tight text-blue-600">
+            <span className="hidden sm:inline text-xl font-extrabold tracking-tight text-blue-600">
               CSeddit
             </span>
           </Link>
@@ -106,7 +106,7 @@ export default function Header() {
         {/* Global Search Bar */}
         <form
           onSubmit={handleSearchSubmit}
-          className="mx-4 max-w-md flex-1 sm:mx-8"
+          className="mx-1 sm:mx-8 max-w-xs sm:max-w-md flex-1"
         >
           <div className="relative flex items-center">
             <MagnifyingGlassIcon className="absolute left-3 h-4 w-4 text-muted-foreground" />
@@ -115,7 +115,7 @@ export default function Header() {
               placeholder="Search discussions..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-9 w-full border-muted bg-muted/50 pl-9 focus-visible:ring-blue-500"
+              className="h-9 w-full rounded-none border-muted bg-muted/50 pl-9 focus-visible:ring-blue-500"
             />
           </div>
         </form>
@@ -125,7 +125,7 @@ export default function Header() {
           <Link href="/create">
             <Button
               size="sm"
-              className="flex gap-1 bg-blue-600 text-white hover:bg-blue-700"
+              className="flex gap-1 bg-blue-600 text-white hover:bg-blue-700 rounded-none"
             >
               <PlusIcon className="h-4 w-4" weight="bold" />
               <span className="hidden sm:inline">Ask Question</span>
@@ -134,7 +134,7 @@ export default function Header() {
 
           {/* Leaderboard Icon (Mobile only) */}
           <Link href="/leaderboard" className="md:hidden">
-            <Button size="icon" variant="ghost" className="h-9 w-9">
+            <Button size="icon" variant="ghost" className="h-9 w-9 rounded-none">
               <TrophyIcon className="h-5 w-5 text-muted-foreground" />
             </Button>
           </Link>
@@ -154,7 +154,7 @@ export default function Header() {
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuContent align="end" className="w-56 rounded-none">
                 <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">
                   Logged in as
                 </DropdownMenuLabel>
@@ -171,7 +171,7 @@ export default function Header() {
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href="/profile" className="w-full cursor-pointer">
+                  <Link href={`/profiles/${currentUser.id}`} className="w-full cursor-pointer">
                     View profile
                   </Link>
                 </DropdownMenuItem>

@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { formatTimeAgo, getPostTypeIcon } from "@/lib/utils";
+import { formatTimeAgo, getPostTypeIcon } from "@/lib/postUtils";
 
 function SearchResultsContent() {
   const searchParams = useSearchParams();

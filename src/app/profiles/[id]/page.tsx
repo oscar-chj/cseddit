@@ -12,7 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { StarIcon, ThumbsUpIcon, ThumbsDownIcon, BookOpenIcon, FileTextIcon } from "@phosphor-icons/react";
-import { formatTimeAgo } from "@/lib/utils";
+import { formatTimeAgo } from "@/lib/postUtils";
 
 export default function UserProfilePage() {
   const params = useParams();
@@ -190,7 +190,7 @@ export default function UserProfilePage() {
                     id="default-anonymity"
                     checked={user.anonymousByDefault}
                     onCheckedChange={handleToggleAnonymity}
-                    className="data-[state=checked]:bg-blue-600 rounded-full"
+                    className="data-[state=checked]:bg-blue-600"
                   />
                   <Label htmlFor="default-anonymity" className="text-xs font-semibold cursor-pointer">
                     Publish questions anonymously by default

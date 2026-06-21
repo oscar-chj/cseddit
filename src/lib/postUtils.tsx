@@ -1,11 +1,5 @@
 import React from "react"
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
 import { ImageIcon, LinkIcon, ChartBarIcon } from "@phosphor-icons/react"
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
 
 export function formatTimeAgo(timestamp: number): string {
   const diff = Date.now() - timestamp
