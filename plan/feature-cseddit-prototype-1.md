@@ -4,7 +4,7 @@ version: 1.0
 date_created: 2026-06-21
 last_updated: 2026-06-21
 owner: Antigravity
-status: Planned
+status: In progress
 tags:
   - feature
   - architecture
@@ -13,7 +13,7 @@ tags:
 
 # Introduction
 
-![Status: Planned](https://img.shields.io/badge/status-Planned-blue)
+![Status: In progress](https://img.shields.io/badge/status-In_progress-yellow)
 
 Implementation plan for **CSeddit**, a desktop-optimized, high-density technical Q&A web forum prototype styled after Stack Overflow and Reddit. The prototype runs client-side using Next.js App Router, TailwindCSS v4, and Shadcn UI, with state persistent in `localStorage`.
 
@@ -37,8 +37,8 @@ Implementation plan for **CSeddit**, a desktop-optimized, high-density technical
 
 | Task | Description | Completed | Date |
 |------|-------------|-----------|------|
-| TASK-001 | Create `src/types/index.ts` to define types for `User`, `Post`, `Answer`, `Comment`, `Draft`. | | |
-| TASK-002 | Create `src/lib/mockDb.ts` to implement local CRUD functions and initialize state with mock users (Chloe Tan, Alex Mercer, etc.) and posts in `localStorage`. | | |
+| TASK-001 | Create `src/types/index.ts` to define types for `User`, `Post`, `Answer`, `Comment`, `Draft`. | ✅ | 2026-06-21 |
+| TASK-002 | Create `src/lib/mockDb.ts` to implement local CRUD functions and initialize state with mock users (Chloe Tan, Alex Mercer, etc.) and posts in `localStorage`. | ✅ | 2026-06-21 |
 
 ### Phase 2: Global Shell layout and Header
 
