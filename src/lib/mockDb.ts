@@ -129,12 +129,28 @@ function recalculateAllUsersStats(): void {
 export function initializeDb(force = false): void {
   if (isServer) return;
 
+  // Migrate existing users to ensure username (handle) is equal to their unique id slug
+  if (localStorage.getItem("cseddit_users")) {
+    const existingUsers = getRaw<User[]>("cseddit_users", []);
+    let changed = false;
+    const migrated = existingUsers.map((u) => {
+      if (u.username !== u.id) {
+        changed = true;
+        return { ...u, username: u.id };
+      }
+      return u;
+    });
+    if (changed) {
+      setRaw("cseddit_users", migrated);
+    }
+  }
+
   if (force || !localStorage.getItem("cseddit_posts") || !localStorage.getItem("cseddit_users")) {
     const seedUsers: User[] = [
       {
         id: "chloe_tan",
         name: "Chloe Tan",
-        username: "chloetan",
+        username: "chloe_tan",
         title: "Computer Science Student",
         bio: "UI/UX enthusiast and Frontend Developer. Love building sleek, user-friendly interfaces.",
         avatar: "👾",
@@ -150,7 +166,7 @@ export function initializeDb(force = false): void {
       {
         id: "alex_mercer",
         name: "Alex Mercer",
-        username: "alexmercer",
+        username: "alex_mercer",
         title: "Senior Software Engineer",
         bio: "Full-stack developer specializing in Next.js and distributed systems. Always optimization-first.",
         avatar: "🔥",
@@ -166,7 +182,7 @@ export function initializeDb(force = false): void {
       {
         id: "sarah_connor",
         name: "Sarah Connor",
-        username: "sconnor",
+        username: "sarah_connor",
         title: "Cybersecurity Expert",
         bio: "Defending networks and coding in Rust.",
         avatar: "🛡️",
@@ -182,7 +198,7 @@ export function initializeDb(force = false): void {
       {
         id: "john_doe",
         name: "John Doe",
-        username: "johndoe",
+        username: "john_doe",
         title: "Intro to CS TA",
         bio: "Helping students debug their first programs and understand pointers.",
         avatar: "💻",

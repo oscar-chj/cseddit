@@ -186,10 +186,10 @@ export default function LeaderboardPage() {
                         </p>
                         <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                           <Badge variant="outline" className="text-[9px] font-medium px-1.5 py-0 border-border text-muted-foreground rounded-none">
-                            {user.department}
+                            Dept: {user.department}
                           </Badge>
                           <Badge variant="outline" className="text-[9px] font-medium px-1.5 py-0 border-border text-muted-foreground rounded-none">
-                            {user.yearOfStudy}
+                            Year: {user.yearOfStudy}
                           </Badge>
                         </div>
                       </div>

@@ -102,7 +102,7 @@ function SearchResultsContent() {
                 className="p-5 hover:bg-muted/30 transition-colors flex flex-col md:flex-row md:items-start gap-4"
               >
                 {/* Scores Sidebar (Desktop) */}
-                <div className="hidden md:flex flex-col items-center justify-center gap-1.5 text-center min-w-[50px] py-2 bg-muted/20 border border-border rounded-none">
+                <div className="hidden md:flex flex-col items-center justify-center gap-1.5 text-center min-w-[40px] py-1 bg-transparent rounded-none">
                   <Button
                     size="icon"
                     variant="ghost"
@@ -183,7 +183,7 @@ function SearchResultsContent() {
 
                     {/* Vote summary for mobile */}
                     <div className="flex items-center gap-3 text-xs text-muted-foreground md:hidden">
-                      <div className="flex items-center border border-border bg-muted/20 rounded-none h-7 overflow-hidden">
+                      <div className="flex items-center bg-transparent rounded-none h-7 overflow-hidden">
                         <Button
                           size="icon"
                           variant="ghost"

@@ -130,14 +130,14 @@ export default function UserProfilePage() {
                 
                 {/* Department, Course, Year of Study Tags */}
                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5">
-                  <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-50 border-none text-[10px] font-normal px-2 rounded-none">
-                    {user.department}
+                  <Badge variant="secondary" className="text-[10px] font-normal px-2 rounded-none">
+                    Dept: {user.department}
                   </Badge>
-                  <Badge variant="outline" className="border-border text-muted-foreground text-[10px] font-normal px-2 rounded-none">
-                    {user.course}
+                  <Badge variant="outline" className="border-border text-[10px] font-normal px-2 rounded-none">
+                    Course: {user.course}
                   </Badge>
-                  <Badge variant="outline" className="border-border text-muted-foreground text-[10px] font-normal px-2 rounded-none">
-                    {user.yearOfStudy}
+                  <Badge variant="outline" className="border-border text-[10px] font-normal px-2 rounded-none">
+                    Year: {user.yearOfStudy}
                   </Badge>
                 </div>
 
@@ -152,8 +152,8 @@ export default function UserProfilePage() {
 
               {/* Stats Counters */}
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 sm:gap-6 pt-2">
-                <div className="flex items-center gap-2 bg-blue-50/50 border border-blue-100 px-3.5 py-2 rounded-none">
-                  <StarIcon className="h-5 w-5 text-blue-600" weight="fill" />
+                <div className="flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 px-3.5 py-2 rounded-none">
+                  <StarIcon className="h-5 w-5 text-blue-500" weight="fill" />
                   <div className="text-left">
                     <span className="block text-sm font-bold text-foreground leading-none">
                       {user.reputation}
@@ -162,8 +162,8 @@ export default function UserProfilePage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 bg-emerald-50/50 border border-emerald-100 px-3.5 py-2 rounded-none">
-                  <ThumbsUpIcon className="h-5 w-5 text-emerald-600" weight="fill" />
+                <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-3.5 py-2 rounded-none">
+                  <ThumbsUpIcon className="h-5 w-5 text-emerald-500" weight="fill" />
                   <div className="text-left">
                     <span className="block text-sm font-bold text-foreground leading-none">
                       {user.likes}
@@ -172,8 +172,8 @@ export default function UserProfilePage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 bg-red-50/50 border border-red-100 px-3.5 py-2 rounded-none">
-                  <ThumbsDownIcon className="h-5 w-5 text-red-600" weight="fill" />
+                <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 px-3.5 py-2 rounded-none">
+                  <ThumbsDownIcon className="h-5 w-5 text-red-500" weight="fill" />
                   <div className="text-left">
                     <span className="block text-sm font-bold text-foreground leading-none">
                       {user.dislikes}
