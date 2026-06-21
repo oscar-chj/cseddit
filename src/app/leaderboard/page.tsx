@@ -13,11 +13,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { TrophyIcon, StarIcon, ThumbsUpIcon, ThumbsDownIcon } from "@phosphor-icons/react";
+import { TrophyIcon, StarIcon, ThumbsUpIcon } from "@phosphor-icons/react";
 
 export default function LeaderboardPage() {
   const [users, setUsers] = useState<User[]>([]);
-  const [sortBy, setSortBy] = useState<"reputation" | "likes" | "dislikes">("reputation");
+  const [sortBy, setSortBy] = useState<"reputation" | "likes">("reputation");
   const [deptFilter, setDeptFilter] = useState<string>("all");
   const [yosFilter, setYosFilter] = useState<string>("all");
   const [mounted, setMounted] = useState(false);
@@ -50,8 +50,6 @@ export default function LeaderboardPage() {
   const sortedUsers = [...filteredUsers].sort((a, b) => {
     if (sortBy === "likes") {
       return b.likes - a.likes;
-    } else if (sortBy === "dislikes") {
-      return b.dislikes - a.dislikes;
     } else {
       return b.reputation - a.reputation;
     }
@@ -118,7 +116,7 @@ export default function LeaderboardPage() {
             <span className="text-xs font-semibold text-muted-foreground whitespace-nowrap">Sort by</span>
             <Select
               value={sortBy}
-              onValueChange={(val) => setSortBy(val as "reputation" | "likes" | "dislikes")}
+              onValueChange={(val) => setSortBy(val as "reputation" | "likes")}
             >
               <SelectTrigger className="w-[130px] h-9 text-xs border-border">
                 <SelectValue placeholder="Ranking Criteria" />
@@ -126,7 +124,6 @@ export default function LeaderboardPage() {
               <SelectContent>
                 <SelectItem value="reputation" className="text-xs">Reputation</SelectItem>
                 <SelectItem value="likes" className="text-xs">Total Likes</SelectItem>
-                <SelectItem value="dislikes" className="text-xs">Total Dislikes</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -202,11 +199,6 @@ export default function LeaderboardPage() {
                       <div className="flex items-center gap-1.5 text-emerald-600">
                         <ThumbsUpIcon className="h-4 w-4" weight="fill" />
                         <span className="text-sm font-bold">{user.likes}</span>
-                      </div>
-                    ) : sortBy === "dislikes" ? (
-                      <div className="flex items-center gap-1.5 text-red-600">
-                        <ThumbsDownIcon className="h-4 w-4" weight="fill" />
-                        <span className="text-sm font-bold">{user.dislikes}</span>
                       </div>
                     ) : (
                       <div className="flex items-center gap-1.5 text-blue-600">

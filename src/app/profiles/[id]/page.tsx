@@ -11,7 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { StarIcon, ThumbsUpIcon, ThumbsDownIcon, BookOpenIcon, FileTextIcon } from "@phosphor-icons/react";
+import { StarIcon, ThumbsUpIcon, BookOpenIcon, FileTextIcon } from "@phosphor-icons/react";
 import { formatTimeAgo } from "@/lib/postUtils";
 
 export default function UserProfilePage() {
@@ -128,13 +128,10 @@ export default function UserProfilePage() {
                   <span className="text-xs text-muted-foreground self-center">@{user.username}</span>
                 </div>
                 
-                {/* Department, Course, Year of Study Tags */}
+                {/* Department & Year of Study Tags */}
                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5">
                   <Badge variant="secondary" className="text-[10px] font-normal px-2 rounded-none">
                     Dept: {user.department}
-                  </Badge>
-                  <Badge variant="outline" className="border-border text-[10px] font-normal px-2 rounded-none">
-                    Course: {user.course}
                   </Badge>
                   <Badge variant="outline" className="border-border text-[10px] font-normal px-2 rounded-none">
                     Year: {user.yearOfStudy}
@@ -172,15 +169,7 @@ export default function UserProfilePage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 px-3.5 py-2 rounded-none">
-                  <ThumbsDownIcon className="h-5 w-5 text-red-500" weight="fill" />
-                  <div className="text-left">
-                    <span className="block text-sm font-bold text-foreground leading-none">
-                      {user.dislikes}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground font-medium">Dislikes</span>
-                  </div>
-                </div>
+
               </div>
 
               {/* Default Anonymity Setting Toggle */}
