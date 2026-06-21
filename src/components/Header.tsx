@@ -8,6 +8,7 @@ import {
   TrophyIcon,
   PlusIcon,
   ChatsIcon,
+  BellIcon,
 } from "@phosphor-icons/react"
 import { getCurrentUser, getUsers, setCurrentUserId } from "@/lib/mockDb"
 import { User } from "@/types"
