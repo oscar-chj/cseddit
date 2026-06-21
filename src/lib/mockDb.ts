@@ -359,7 +359,7 @@ export function getPostById(id: string): PostDetail | null {
 }
 
 export function createPost(
-  postInput: Omit<Post, "id" | "timestamp" | "upvotes" | "downvotes" | "isFeatured"> & { isFeatured?: boolean }
+  postInput: Omit<Post, "id" | "timestamp" | "upvotes" | "downvotes" | "authorName" | "authorAvatar" | "isFeatured"> & { isFeatured?: boolean }
 ): Post {
   initializeDb();
   const posts = getRaw<Post[]>("cseddit_posts", []);
@@ -370,6 +370,8 @@ export function createPost(
     timestamp: Date.now(),
     upvotes: [],
     downvotes: [],
+    authorName: "",
+    authorAvatar: "",
     isFeatured: postInput.isFeatured ?? false,
   };
   posts.unshift(newPost);
@@ -383,9 +385,13 @@ export function updatePost(post: Post): void {
   const posts = getRaw<Post[]>("cseddit_posts", []);
   const index = posts.findIndex((p) => p.id === post.id);
   if (index !== -1) {
+    const oldAuthorId = posts[index].authorId;
     posts[index] = post;
     setRaw("cseddit_posts", posts);
     recalculateUserStats(post.authorId);
+    if (oldAuthorId !== post.authorId) {
+      recalculateUserStats(oldAuthorId);
+    }
   }
 }
 
@@ -417,7 +423,7 @@ export function deletePost(id: string): void {
 }
 
 export function createAnswer(
-  answerInput: Omit<Answer, "id" | "timestamp" | "upvotes" | "downvotes">
+  answerInput: Omit<Answer, "id" | "timestamp" | "upvotes" | "downvotes" | "authorName" | "authorAvatar">
 ): Answer {
   initializeDb();
   const answers = getRaw<Answer[]>("cseddit_answers", []);
@@ -428,6 +434,8 @@ export function createAnswer(
     timestamp: Date.now(),
     upvotes: [],
     downvotes: [],
+    authorName: "",
+    authorAvatar: "",
   };
   answers.push(newAnswer);
   setRaw("cseddit_answers", answers);
@@ -436,7 +444,7 @@ export function createAnswer(
 }
 
 export function createComment(
-  commentInput: Omit<Comment, "id" | "timestamp">
+  commentInput: Omit<Comment, "id" | "timestamp" | "authorName" | "authorAvatar">
 ): Comment {
   initializeDb();
   const comments = getRaw<Comment[]>("cseddit_comments", []);
@@ -445,6 +453,8 @@ export function createComment(
     ...commentInput,
     id,
     timestamp: Date.now(),
+    authorName: "",
+    authorAvatar: "",
   };
   comments.push(newComment);
   setRaw("cseddit_comments", comments);
@@ -456,11 +466,12 @@ export function votePost(
   userId: string,
   type: "up" | "down"
 ): void {
-  if (userId === "anonymous") return;
+  if (!userId || userId === "anonymous") return;
   initializeDb();
   const posts = getRaw<Post[]>("cseddit_posts", []);
   const post = posts.find((p) => p.id === postId);
   if (!post) return;
+  if (post.authorId === userId) return;
 
   const alreadyUpvoted = post.upvotes.includes(userId);
   const alreadyDownvoted = post.downvotes.includes(userId);
@@ -494,11 +505,12 @@ export function voteAnswer(
   userId: string,
   type: "up" | "down"
 ): void {
-  if (userId === "anonymous") return;
+  if (!userId || userId === "anonymous") return;
   initializeDb();
   const answers = getRaw<Answer[]>("cseddit_answers", []);
   const answer = answers.find((a) => a.id === answerId);
   if (!answer) return;
+  if (answer.authorId === userId) return;
 
   const alreadyUpvoted = answer.upvotes.includes(userId);
   const alreadyDownvoted = answer.downvotes.includes(userId);
