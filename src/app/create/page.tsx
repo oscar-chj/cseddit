@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getCurrentUserId, createPost, saveDraft, getDrafts, deleteDraft } from "@/lib/mockDb";
+import { getCurrentUserId, getCurrentUser, createPost, saveDraft, getDrafts, deleteDraft } from "@/lib/mockDb";
 import { Draft } from "@/types";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
@@ -13,15 +13,15 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  TextB,
-  TextItalic,
-  TextUnderline,
-  ListBullets,
-  ListNumbers,
-  Code,
-  FloppyDisk,
-  PaperPlaneTilt,
-  Trash
+  TextBIcon,
+  TextItalicIcon,
+  TextUnderlineIcon,
+  ListBulletsIcon,
+  ListNumbersIcon,
+  CodeIcon,
+  FloppyDiskIcon,
+  PaperPlaneTiltIcon,
+  TrashIcon
 } from "@phosphor-icons/react";
 
 const AVAILABLE_TAGS = [
@@ -49,8 +49,15 @@ export default function AskQuestionPage() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    setDrafts(getDrafts());
+    const draftsList = getDrafts();
+    const currentUser = getCurrentUser();
+    setTimeout(() => {
+      setMounted(true);
+      setDrafts(draftsList);
+      if (currentUser) {
+        setIsAnonymous(currentUser.anonymousByDefault);
+      }
+    }, 0);
   }, []);
 
   const handleTagToggle = (tag: string) => {
@@ -224,7 +231,7 @@ export default function AskQuestionPage() {
                     onClick={() => insertMarkdown("**", "**")}
                     title="Bold"
                   >
-                    <TextB className="h-4 w-4" />
+                    <TextBIcon className="h-4 w-4" />
                   </Button>
                   <Button
                     size="icon"
@@ -233,7 +240,7 @@ export default function AskQuestionPage() {
                     onClick={() => insertMarkdown("*", "*")}
                     title="Italic"
                   >
-                    <TextItalic className="h-4 w-4" />
+                    <TextItalicIcon className="h-4 w-4" />
                   </Button>
                   <Button
                     size="icon"
@@ -242,7 +249,7 @@ export default function AskQuestionPage() {
                     onClick={() => insertMarkdown("<u>", "</u>")}
                     title="Underline"
                   >
-                    <TextUnderline className="h-4 w-4" />
+                    <TextUnderlineIcon className="h-4 w-4" />
                   </Button>
                   <span className="w-px h-5 bg-border mx-1" />
                   <Button
@@ -252,7 +259,7 @@ export default function AskQuestionPage() {
                     onClick={() => insertMarkdown("- ", "")}
                     title="Bullet List"
                   >
-                    <ListBullets className="h-4 w-4" />
+                    <ListBulletsIcon className="h-4 w-4" />
                   </Button>
                   <Button
                     size="icon"
@@ -261,7 +268,7 @@ export default function AskQuestionPage() {
                     onClick={() => insertMarkdown("1. ", "")}
                     title="Numbered List"
                   >
-                    <ListNumbers className="h-4 w-4" />
+                    <ListNumbersIcon className="h-4 w-4" />
                   </Button>
                   <Button
                     size="icon"
@@ -270,7 +277,7 @@ export default function AskQuestionPage() {
                     onClick={() => insertMarkdown("`", "`")}
                     title="Inline Code"
                   >
-                    <Code className="h-4 w-4" />
+                    <CodeIcon className="h-4 w-4" />
                   </Button>
                 </div>
 
@@ -315,7 +322,7 @@ export default function AskQuestionPage() {
                 onClick={handlePost}
                 className="bg-blue-600 hover:bg-blue-700 text-white gap-1.5 h-10 px-5"
               >
-                <PaperPlaneTilt className="h-4 w-4" weight="bold" />
+                <PaperPlaneTiltIcon className="h-4 w-4" weight="bold" />
                 Post
               </Button>
               <Button
@@ -323,7 +330,7 @@ export default function AskQuestionPage() {
                 onClick={handleSaveDraft}
                 className="border-border hover:bg-blue-50 hover:text-blue-600 transition-colors gap-1.5 h-10"
               >
-                <FloppyDisk className="h-4 w-4" />
+                <FloppyDiskIcon className="h-4 w-4" />
                 Save draft
               </Button>
             </div>
@@ -357,7 +364,7 @@ export default function AskQuestionPage() {
                       onClick={(e) => handleDeleteDraft(e, draft.id)}
                       className="text-muted-foreground hover:text-destructive transition-colors p-0.5"
                     >
-                      <Trash className="h-3.5 w-3.5" />
+                      <TrashIcon className="h-3.5 w-3.5" />
                     </button>
                   </div>
                   <p className="text-[10px] text-muted-foreground line-clamp-2 mt-1">

@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Star, ThumbsUp, ThumbsDown, BookOpen } from "@phosphor-icons/react";
+import { StarIcon, ThumbsUpIcon, ThumbsDownIcon, BookOpenIcon } from "@phosphor-icons/react";
 
 function formatTimeAgo(timestamp: number) {
   const diff = Date.now() - timestamp;
@@ -39,8 +39,10 @@ export default function UserProfilePage() {
   };
 
   useEffect(() => {
-    setMounted(true);
-    loadData();
+    setTimeout(() => {
+      setMounted(true);
+      loadData();
+    }, 0);
   }, []);
 
   const handleToggleAnonymity = (checked: boolean) => {
@@ -111,7 +113,7 @@ export default function UserProfilePage() {
               {/* Stats Counters */}
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 sm:gap-6 pt-2">
                 <div className="flex items-center gap-2 bg-blue-50/50 border border-blue-100 px-3.5 py-2 rounded-lg">
-                  <Star className="h-5 w-5 text-blue-600" weight="fill" />
+                  <StarIcon className="h-5 w-5 text-blue-600" weight="fill" />
                   <div className="text-left">
                     <span className="block text-sm font-bold text-foreground leading-none">
                       {user.reputation}
@@ -121,7 +123,7 @@ export default function UserProfilePage() {
                 </div>
 
                 <div className="flex items-center gap-2 bg-emerald-50/50 border border-emerald-100 px-3.5 py-2 rounded-lg">
-                  <ThumbsUp className="h-5 w-5 text-emerald-600" weight="fill" />
+                  <ThumbsUpIcon className="h-5 w-5 text-emerald-600" weight="fill" />
                   <div className="text-left">
                     <span className="block text-sm font-bold text-foreground leading-none">
                       {user.likes}
@@ -131,7 +133,7 @@ export default function UserProfilePage() {
                 </div>
 
                 <div className="flex items-center gap-2 bg-red-50/50 border border-red-100 px-3.5 py-2 rounded-lg">
-                  <ThumbsDown className="h-5 w-5 text-red-600" weight="fill" />
+                  <ThumbsDownIcon className="h-5 w-5 text-red-600" weight="fill" />
                   <div className="text-left">
                     <span className="block text-sm font-bold text-foreground leading-none">
                       {user.dislikes}
@@ -161,7 +163,7 @@ export default function UserProfilePage() {
       {/* User's Created Posts Feed */}
       <div className="space-y-4">
         <h2 className="text-base font-bold text-foreground flex items-center gap-2 border-b border-border pb-2">
-          <BookOpen className="h-5 w-5 text-blue-600" />
+          <BookOpenIcon className="h-5 w-5 text-blue-600" />
           My Questions ({userPosts.length})
         </h2>
 

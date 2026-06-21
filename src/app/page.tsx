@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowUp, Chat } from "@phosphor-icons/react";
+import { ArrowUpIcon, ChatIcon } from "@phosphor-icons/react";
 import { getPosts } from "@/lib/mockDb";
 import { Post } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,8 +29,11 @@ export default function Dashboard() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    setPosts(getPosts());
+    const allPosts = getPosts();
+    setTimeout(() => {
+      setMounted(true);
+      setPosts(allPosts);
+    }, 0);
   }, []);
 
   if (!mounted) {
@@ -104,7 +107,7 @@ export default function Dashboard() {
                   <span>{formatTimeAgo(post.timestamp)}</span>
                   <div className="flex items-center gap-3">
                     <span className="flex items-center gap-1 font-medium text-foreground">
-                      <ArrowUp className="h-3.5 w-3.5 text-blue-600" />
+                      <ArrowUpIcon className="h-3.5 w-3.5 text-blue-600" />
                       {score}
                     </span>
                   </div>
@@ -203,11 +206,11 @@ export default function Dashboard() {
                       {/* Vote/Comments summary for mobile */}
                       <div className="flex items-center gap-3 text-xs text-muted-foreground md:hidden">
                         <span className="flex items-center gap-1">
-                          <ArrowUp className="h-3.5 w-3.5" />
+                          <ArrowUpIcon className="h-3.5 w-3.5" />
                           {score}
                         </span>
                         <span className="flex items-center gap-1">
-                          <Chat className="h-3.5 w-3.5" />
+                          <ChatIcon className="h-3.5 w-3.5" />
                           {/* answers are fetched client-side but we can keep it simple or look it up */}
                           Answer
                         </span>

@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Trophy, Star, ThumbsUp, ThumbsDown } from "@phosphor-icons/react";
+import { TrophyIcon, StarIcon, ThumbsUpIcon, ThumbsDownIcon } from "@phosphor-icons/react";
 
 export default function LeaderboardPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -20,8 +20,11 @@ export default function LeaderboardPage() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    setUsers(getUsers());
+    const list = getUsers();
+    setTimeout(() => {
+      setMounted(true);
+      setUsers(list);
+    }, 0);
   }, []);
 
   if (!mounted) {
@@ -50,7 +53,7 @@ export default function LeaderboardPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-border pb-4 gap-4">
         <div className="space-y-0.5">
           <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
-            <Trophy className="h-6 w-6 text-yellow-500" weight="fill" />
+            <TrophyIcon className="h-6 w-6 text-yellow-500" weight="fill" />
             Contributor Leaderboard
           </h1>
           <p className="text-sm text-muted-foreground">
@@ -94,7 +97,7 @@ export default function LeaderboardPage() {
                   {/* Rank badge */}
                   <div className="flex items-center justify-center h-8 w-8 min-w-[32px] rounded-full bg-muted border border-border">
                     {isFirst ? (
-                      <Trophy className="h-4 w-4 text-yellow-500" weight="fill" />
+                      <TrophyIcon className="h-4 w-4 text-yellow-500" weight="fill" />
                     ) : (
                       <span className="text-xs font-bold text-muted-foreground">{rank}</span>
                     )}
@@ -127,17 +130,17 @@ export default function LeaderboardPage() {
                 <div className="flex items-center gap-4 text-right">
                   {sortBy === "likes" ? (
                     <div className="flex items-center gap-1.5 text-emerald-600">
-                      <ThumbsUp className="h-4 w-4" weight="fill" />
+                      <ThumbsUpIcon className="h-4 w-4" weight="fill" />
                       <span className="text-sm font-bold">{user.likes}</span>
                     </div>
                   ) : sortBy === "dislikes" ? (
                     <div className="flex items-center gap-1.5 text-red-600">
-                      <ThumbsDown className="h-4 w-4" weight="fill" />
+                      <ThumbsDownIcon className="h-4 w-4" weight="fill" />
                       <span className="text-sm font-bold">{user.dislikes}</span>
                     </div>
                   ) : (
                     <div className="flex items-center gap-1.5 text-blue-600">
-                      <Star className="h-4 w-4" weight="fill" />
+                      <StarIcon className="h-4 w-4" weight="fill" />
                       <span className="text-sm font-bold">{user.reputation}</span>
                     </div>
                   )}

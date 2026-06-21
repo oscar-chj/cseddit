@@ -3,7 +3,7 @@
 import React, { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ArrowUp, Chat } from "@phosphor-icons/react";
+import { ArrowUpIcon, ChatIcon } from "@phosphor-icons/react";
 import { getPosts } from "@/lib/mockDb";
 import { Post } from "@/types";
 import { Badge } from "@/components/ui/badge";
@@ -28,8 +28,11 @@ function SearchResultsContent() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    setPosts(getPosts());
+    const allPosts = getPosts();
+    setTimeout(() => {
+      setMounted(true);
+      setPosts(allPosts);
+    }, 0);
   }, []);
 
   if (!mounted) {
@@ -143,11 +146,11 @@ function SearchResultsContent() {
                     {/* Vote summary for mobile */}
                     <div className="flex items-center gap-3 text-xs text-muted-foreground md:hidden">
                       <span className="flex items-center gap-1">
-                        <ArrowUp className="h-3.5 w-3.5" />
+                        <ArrowUpIcon className="h-3.5 w-3.5" />
                         {score}
                       </span>
                       <span className="flex items-center gap-1">
-                        <Chat className="h-3.5 w-3.5" />
+                        <ChatIcon className="h-3.5 w-3.5" />
                         Reply
                       </span>
                     </div>

@@ -1,12 +1,17 @@
-"use client";
+"use client"
 
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { MagnifyingGlass, Bell, Trophy, Plus, Chats } from "@phosphor-icons/react";
-import { getCurrentUser, getUsers, setCurrentUserId } from "@/lib/mockDb";
-import { User } from "@/types";
-import { toast } from "sonner";
+import React, { useEffect, useState } from "react"
+import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
+import {
+  MagnifyingGlassIcon,
+  TrophyIcon,
+  PlusIcon,
+  ChatsIcon,
+} from "@phosphor-icons/react"
+import { getCurrentUser, getUsers, setCurrentUserId } from "@/lib/mockDb"
+import { User } from "@/types"
+import { toast } from "sonner"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,37 +19,41 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 
 export default function Header() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [allUsers, setAllUsers] = useState<User[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [mounted, setMounted] = useState(false);
+  const router = useRouter()
+  const pathname = usePathname()
+  const [currentUser, setCurrentUser] = useState<User | null>(null)
+  const [allUsers, setAllUsers] = useState<User[]>([])
+  const [searchQuery, setSearchQuery] = useState("")
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true);
-    setCurrentUser(getCurrentUser());
-    setAllUsers(getUsers());
-  }, []);
+    const user = getCurrentUser()
+    const users = getUsers()
+    setTimeout(() => {
+      setMounted(true)
+      setCurrentUser(user)
+      setAllUsers(users)
+    }, 0)
+  }, [])
 
   const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
     }
-  };
+  }
 
   const handleUserSwitch = (userId: string, userName: string) => {
-    setCurrentUserId(userId);
-    toast(`Logged in as ${userName}`);
-    window.location.reload();
-  };
+    setCurrentUserId(userId)
+    toast(`Logged in as ${userName}`)
+    window.location.reload()
+  }
 
   if (!mounted) {
     return (
@@ -53,22 +62,24 @@ export default function Header() {
           <div className="flex items-center gap-6">
             <span className="text-lg font-bold text-blue-600">CSeddit</span>
           </div>
-          <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
+          <div className="h-8 w-8 animate-pulse rounded-full bg-muted" />
         </div>
       </header>
-    );
+    )
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-md border-border">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
         {/* Brand & Left Navigation */}
         <div className="flex items-center gap-6 md:gap-8">
           <Link href="/" className="flex items-center gap-2">
-            <Chats className="h-6 w-6 text-blue-600" weight="fill" />
-            <span className="text-xl font-extrabold tracking-tight text-blue-600">CSeddit</span>
+            <ChatsIcon className="h-6 w-6 text-blue-600" weight="fill" />
+            <span className="text-xl font-extrabold tracking-tight text-blue-600">
+              CSeddit
+            </span>
           </Link>
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+          <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
             <Link
               href="/"
               className={`transition-colors hover:text-blue-600 ${
@@ -80,25 +91,30 @@ export default function Header() {
             <Link
               href="/leaderboard"
               className={`flex items-center gap-1 transition-colors hover:text-blue-600 ${
-                pathname === "/leaderboard" ? "text-blue-600" : "text-muted-foreground"
+                pathname === "/leaderboard"
+                  ? "text-blue-600"
+                  : "text-muted-foreground"
               }`}
             >
-              <Trophy className="h-4 w-4" />
+              <TrophyIcon className="h-4 w-4" />
               Leaderboard
             </Link>
           </nav>
         </div>
 
         {/* Global Search Bar */}
-        <form onSubmit={handleSearchSubmit} className="flex-1 max-w-md mx-4 sm:mx-8">
+        <form
+          onSubmit={handleSearchSubmit}
+          className="mx-4 max-w-md flex-1 sm:mx-8"
+        >
           <div className="relative flex items-center">
-            <MagnifyingGlass className="absolute left-3 h-4 w-4 text-muted-foreground" />
+            <MagnifyingGlassIcon className="absolute left-3 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Search discussions..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-9 w-full bg-muted/50 border-muted focus-visible:ring-blue-500"
+              className="h-9 w-full border-muted bg-muted/50 pl-9 focus-visible:ring-blue-500"
             />
           </div>
         </form>
@@ -106,8 +122,11 @@ export default function Header() {
         {/* Right Controls */}
         <div className="flex items-center gap-3 sm:gap-4">
           <Link href="/create">
-            <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white gap-1 flex">
-              <Plus className="h-4 w-4" weight="bold" />
+            <Button
+              size="sm"
+              className="flex gap-1 bg-blue-600 text-white hover:bg-blue-700"
+            >
+              <PlusIcon className="h-4 w-4" weight="bold" />
               <span className="hidden sm:inline">Ask Question</span>
             </Button>
           </Link>
@@ -115,37 +134,38 @@ export default function Header() {
           {/* Leaderboard Icon (Mobile only) */}
           <Link href="/leaderboard" className="md:hidden">
             <Button size="icon" variant="ghost" className="h-9 w-9">
-              <Trophy className="h-5 w-5 text-muted-foreground" />
+              <TrophyIcon className="h-5 w-5 text-muted-foreground" />
             </Button>
           </Link>
-
-          {/* Notifications Bell */}
-          <Button size="icon" variant="ghost" className="relative h-9 w-9">
-            <Bell className="h-5 w-5 text-muted-foreground" />
-            <span className="absolute top-2 right-2 flex h-2 w-2 rounded-full bg-blue-600" />
-          </Button>
 
           {/* Switchable User Dropdown Switcher */}
           {currentUser && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0 border border-muted/50">
-                  <Avatar className="h-8 w-8 flex items-center justify-center">
-                    <AvatarFallback className="bg-blue-100 text-blue-800 text-base font-semibold">
+                <Button
+                  variant="ghost"
+                  className="relative h-9 w-9 rounded-full border border-muted/50 p-0"
+                >
+                  <Avatar className="flex h-8 w-8 items-center justify-center">
+                    <AvatarFallback className="bg-blue-100 text-base font-semibold text-blue-800">
                       {currentUser.avatar}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel className="font-semibold text-xs text-muted-foreground">
+                <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">
                   Logged in as
                 </DropdownMenuLabel>
                 <div className="flex items-center gap-2 p-2">
                   <span className="text-xl">{currentUser.avatar}</span>
                   <div className="flex flex-col">
-                    <span className="text-sm font-medium leading-none">{currentUser.name}</span>
-                    <span className="text-xs text-muted-foreground mt-0.5">@{currentUser.username}</span>
+                    <span className="text-sm leading-none font-medium">
+                      {currentUser.name}
+                    </span>
+                    <span className="mt-0.5 text-xs text-muted-foreground">
+                      @{currentUser.username}
+                    </span>
                   </div>
                 </div>
                 <DropdownMenuSeparator />
@@ -155,14 +175,14 @@ export default function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuLabel className="font-semibold text-xs text-muted-foreground">
+                <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">
                   Simulate switching user
                 </DropdownMenuLabel>
                 {allUsers.map((user) => (
                   <DropdownMenuItem
                     key={user.id}
                     onClick={() => handleUserSwitch(user.id, user.name)}
-                    className={`flex items-center justify-between cursor-pointer ${
+                    className={`flex cursor-pointer items-center justify-between ${
                       user.id === currentUser.id ? "bg-muted font-medium" : ""
                     }`}
                   >
@@ -181,5 +201,5 @@ export default function Header() {
         </div>
       </div>
     </header>
-  );
+  )
 }
