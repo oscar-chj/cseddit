@@ -1,140 +1,159 @@
-import { User, Post, Answer, Comment, Draft, PostDetail } from "@/types";
+import { Answer, Comment, Draft, Post, PostDetail, User } from "@/types"
 
-const isServer = typeof window === "undefined";
+const isServer = typeof window === "undefined"
 
 function getRaw<T>(key: string, defaultValue: T): T {
-  if (isServer) return defaultValue;
+  if (isServer) return defaultValue
   try {
-    const data = localStorage.getItem(key);
-    return data ? JSON.parse(data) : defaultValue;
+    const data = localStorage.getItem(key)
+    return data ? JSON.parse(data) : defaultValue
   } catch {
-    return defaultValue;
+    return defaultValue
   }
 }
 
 function setRaw<T>(key: string, value: T): void {
-  if (isServer) return;
+  if (isServer) return
   try {
-    localStorage.setItem(key, JSON.stringify(value));
+    localStorage.setItem(key, JSON.stringify(value))
   } catch (e) {
-    console.error("Failed to write to localStorage", e);
+    console.error("Failed to write to localStorage", e)
   }
 }
 
 function generateUUID(): string {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
-    return crypto.randomUUID();
+    return crypto.randomUUID()
   }
-  return "id_" + Math.random().toString(36).substring(2, 9) + "_" + Date.now();
+  return "id_" + Math.random().toString(36).substring(2, 9) + "_" + Date.now()
 }
 
-function resolveAuthorInfo<T extends { authorId: string; authorName: string; authorAvatar: string }>(
-  item: T,
-  users: User[]
-): T {
+function resolveAuthorInfo<
+  T extends { authorId: string; authorName: string; authorAvatar: string },
+>(item: T, users: User[]): T {
   if (item.authorId === "anonymous") {
     return {
       ...item,
       authorName: "Anonymous",
       authorAvatar: "👤",
-    };
+    }
   }
-  const user = users.find((u) => u.id === item.authorId);
+  const user = users.find((u) => u.id === item.authorId)
   if (user) {
     return {
       ...item,
       authorName: user.name,
       authorAvatar: user.avatar,
-    };
+    }
   }
-  return item;
+  return item
 }
 
 function recalculateUserStats(userId: string): void {
-  if (isServer || !userId || userId === "anonymous") return;
+  if (isServer || !userId || userId === "anonymous") return
 
-  const users = getRaw<User[]>("cseddit_users", []);
-  const posts = getRaw<Post[]>("cseddit_posts", []);
-  const answers = getRaw<Answer[]>("cseddit_answers", []);
+  const users = getRaw<User[]>("cseddit_users", [])
+  const posts = getRaw<Post[]>("cseddit_posts", [])
+  const answers = getRaw<Answer[]>("cseddit_answers", [])
 
-  const userIndex = users.findIndex((u) => u.id === userId);
-  if (userIndex === -1) return;
+  const userIndex = users.findIndex((u) => u.id === userId)
+  if (userIndex === -1) return
 
-  const user = users[userIndex];
-  const answersCount = answers.filter((a) => a.authorId === userId).length;
+  const user = users[userIndex]
+  const answersCount = answers.filter((a) => a.authorId === userId).length
 
-  let likesCount = 0;
-  let dislikesCount = 0;
+  let likesCount = 0
+  let dislikesCount = 0
 
   posts.forEach((p) => {
     if (p.authorId === userId) {
-      likesCount += p.upvotes.length;
-      dislikesCount += p.downvotes.length;
+      likesCount += p.upvotes.length
+      dislikesCount += p.downvotes.length
     }
-  });
+  })
 
   answers.forEach((a) => {
     if (a.authorId === userId) {
-      likesCount += a.upvotes.length;
-      dislikesCount += a.downvotes.length;
+      likesCount += a.upvotes.length
+      dislikesCount += a.downvotes.length
     }
-  });
+  })
 
-  user.likes = likesCount;
-  user.dislikes = dislikesCount;
-  user.reputation = answersCount + likesCount - dislikesCount;
+  user.likes = likesCount
+  user.dislikes = dislikesCount
+  user.reputation = answersCount + likesCount - dislikesCount
 
-  users[userIndex] = user;
-  setRaw("cseddit_users", users);
+  users[userIndex] = user
+  setRaw("cseddit_users", users)
 }
 
 function recalculateAllUsersStats(): void {
-  if (isServer) return;
-  const users = getRaw<User[]>("cseddit_users", []);
-  const posts = getRaw<Post[]>("cseddit_posts", []);
-  const answers = getRaw<Answer[]>("cseddit_answers", []);
+  if (isServer) return
+  const users = getRaw<User[]>("cseddit_users", [])
+  const posts = getRaw<Post[]>("cseddit_posts", [])
+  const answers = getRaw<Answer[]>("cseddit_answers", [])
 
   const updatedUsers = users.map((user) => {
-    const userId = user.id;
-    const answersCount = answers.filter((a) => a.authorId === userId).length;
+    const userId = user.id
+    const answersCount = answers.filter((a) => a.authorId === userId).length
 
-    let likesCount = 0;
-    let dislikesCount = 0;
+    let likesCount = 0
+    let dislikesCount = 0
 
     posts.forEach((p) => {
       if (p.authorId === userId) {
-        likesCount += p.upvotes.length;
-        dislikesCount += p.downvotes.length;
+        likesCount += p.upvotes.length
+        dislikesCount += p.downvotes.length
       }
-    });
+    })
 
     answers.forEach((a) => {
       if (a.authorId === userId) {
-        likesCount += a.upvotes.length;
-        dislikesCount += a.downvotes.length;
+        likesCount += a.upvotes.length
+        dislikesCount += a.downvotes.length
       }
-    });
+    })
 
     return {
       ...user,
       likes: likesCount,
       dislikes: dislikesCount,
       reputation: answersCount + likesCount - dislikesCount,
-    };
-  });
+    }
+  })
 
-  setRaw("cseddit_users", updatedUsers);
+  setRaw("cseddit_users", updatedUsers)
 }
 
 export function initializeDb(force = false): void {
-  if (isServer) return;
+  if (isServer) return
 
-  if (force || !localStorage.getItem("cseddit_posts")) {
+  // Migrate existing users to ensure username (handle) is equal to their unique id slug
+  if (localStorage.getItem("cseddit_users")) {
+    const existingUsers = getRaw<User[]>("cseddit_users", [])
+    let changed = false
+    const migrated = existingUsers.map((u) => {
+      if (u.username !== u.id) {
+        changed = true
+        return { ...u, username: u.id }
+      }
+      return u
+    })
+    if (changed) {
+      setRaw("cseddit_users", migrated)
+    }
+  }
+
+  if (
+    force ||
+    !localStorage.getItem("cseddit_posts") ||
+    !localStorage.getItem("cseddit_users")
+  ) {
     const seedUsers: User[] = [
       {
         id: "chloe_tan",
         name: "Chloe Tan",
-        username: "chloetan",
+        username: "chloe_tan",
         title: "Computer Science Student",
         bio: "UI/UX enthusiast and Frontend Developer. Love building sleek, user-friendly interfaces.",
         avatar: "👾",
@@ -143,11 +162,14 @@ export function initializeDb(force = false): void {
         likes: 0,
         dislikes: 0,
         anonymousByDefault: false,
+        department: "Computer Science",
+        course: "B.Sc. Computer Science",
+        yearOfStudy: "2nd Year",
       },
       {
         id: "alex_mercer",
         name: "Alex Mercer",
-        username: "alexmercer",
+        username: "alex_mercer",
         title: "Senior Software Engineer",
         bio: "Full-stack developer specializing in Next.js and distributed systems. Always optimization-first.",
         avatar: "🔥",
@@ -156,11 +178,14 @@ export function initializeDb(force = false): void {
         likes: 0,
         dislikes: 0,
         anonymousByDefault: false,
+        department: "Software Engineering",
+        course: "B.Sc. Software Engineering",
+        yearOfStudy: "4th Year",
       },
       {
         id: "sarah_connor",
         name: "Sarah Connor",
-        username: "sconnor",
+        username: "sarah_connor",
         title: "Cybersecurity Expert",
         bio: "Defending networks and coding in Rust.",
         avatar: "🛡️",
@@ -169,11 +194,14 @@ export function initializeDb(force = false): void {
         likes: 0,
         dislikes: 0,
         anonymousByDefault: false,
+        department: "Networking",
+        course: "B.Sc. Computer Networks",
+        yearOfStudy: "3rd Year",
       },
       {
         id: "john_doe",
         name: "John Doe",
-        username: "johndoe",
+        username: "john_doe",
         title: "Intro to CS TA",
         bio: "Helping students debug their first programs and understand pointers.",
         avatar: "💻",
@@ -182,10 +210,13 @@ export function initializeDb(force = false): void {
         likes: 0,
         dislikes: 0,
         anonymousByDefault: false,
+        department: "Multimedia",
+        course: "B.Sc. Multimedia Technology",
+        yearOfStudy: "1st Year",
       },
-    ];
+    ]
 
-    const now = Date.now();
+    const now = Date.now()
     const seedPosts: Post[] = [
       {
         id: "post_1",
@@ -200,6 +231,7 @@ export function initializeDb(force = false): void {
         upvotes: ["alex_mercer", "sarah_connor"],
         downvotes: [],
         isFeatured: true,
+        postType: "text",
       },
       {
         id: "post_2",
@@ -214,6 +246,7 @@ export function initializeDb(force = false): void {
         upvotes: ["chloe_tan", "sarah_connor", "john_doe"],
         downvotes: [],
         isFeatured: false,
+        postType: "text",
       },
       {
         id: "post_3",
@@ -228,8 +261,79 @@ export function initializeDb(force = false): void {
         upvotes: ["alex_mercer"],
         downvotes: ["john_doe"],
         isFeatured: false,
+        postType: "text",
       },
-    ];
+      {
+        id: "post_4",
+        title: "Anonymous Feedback on CS301 Exam",
+        content:
+          "The mid-term exam for CS301 was extremely long. Did anyone else struggle to finish it in time, or was it just me?",
+        tags: ["CS301", "Exam", "Feedback"],
+        authorId: "anonymous",
+        authorName: "Anonymous",
+        authorAvatar: "👤",
+        timestamp: now - 6 * 60 * 60 * 1000, // 6 hours ago
+        upvotes: ["chloe_tan"],
+        downvotes: [],
+        isFeatured: false,
+        postType: "text",
+      },
+      {
+        id: "post_5",
+        title: "Microservices Architecture Diagram",
+        content:
+          "Here is the proposed system design for our project. We are splitting the notification service from the core API.",
+        tags: ["Architecture", "SystemDesign", "Microservices"],
+        authorId: "alex_mercer",
+        authorName: "Alex Mercer",
+        authorAvatar: "🔥",
+        timestamp: now - 8 * 60 * 60 * 1000, // 8 hours ago
+        upvotes: ["sarah_connor", "john_doe"],
+        downvotes: [],
+        isFeatured: false,
+        postType: "image",
+        mediaUrl:
+          "https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80",
+      },
+      {
+        id: "post_6",
+        title: "Essential Guide to Rust Memory Management",
+        content:
+          "This article covers ownership, borrowing, and lifetimes in Rust. It's a great read for beginners!",
+        tags: ["Rust", "Systems", "Programming"],
+        authorId: "sarah_connor",
+        authorName: "Sarah Connor",
+        authorAvatar: "🛡️",
+        timestamp: now - 18 * 60 * 60 * 1000, // 18 hours ago
+        upvotes: ["alex_mercer"],
+        downvotes: [],
+        isFeatured: false,
+        postType: "link",
+        mediaUrl:
+          "https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html",
+      },
+      {
+        id: "post_7",
+        title: "What is your primary programming language?",
+        content:
+          "Let's see what languages are most popular in our department this year.",
+        tags: ["Programming", "Survey", "General"],
+        authorId: "john_doe",
+        authorName: "John Doe",
+        authorAvatar: "💻",
+        timestamp: now - 4 * 60 * 60 * 1000, // 4 hours ago
+        upvotes: ["chloe_tan", "alex_mercer"],
+        downvotes: [],
+        isFeatured: false,
+        postType: "poll",
+        pollOptions: [
+          { text: "TypeScript / JavaScript", votes: ["chloe_tan", "john_doe"] },
+          { text: "Python", votes: ["alex_mercer"] },
+          { text: "Rust / C++", votes: ["sarah_connor"] },
+          { text: "Java / C#", votes: [] },
+        ],
+      },
+    ]
 
     const seedAnswers: Answer[] = [
       {
@@ -256,7 +360,7 @@ export function initializeDb(force = false): void {
         upvotes: ["alex_mercer", "sarah_connor"],
         downvotes: [],
       },
-    ];
+    ]
 
     const seedComments: Comment[] = [
       {
@@ -279,91 +383,100 @@ export function initializeDb(force = false): void {
         authorAvatar: "👾",
         timestamp: now - 22 * 60 * 60 * 1000,
       },
-    ];
+    ]
 
-    setRaw("cseddit_users", seedUsers);
-    setRaw("cseddit_posts", seedPosts);
-    setRaw("cseddit_answers", seedAnswers);
-    setRaw("cseddit_comments", seedComments);
-    setRaw("cseddit_drafts", []);
-    setRaw("cseddit_current_user_id", "chloe_tan");
+    setRaw("cseddit_users", seedUsers)
+    setRaw("cseddit_posts", seedPosts)
+    setRaw("cseddit_answers", seedAnswers)
+    setRaw("cseddit_comments", seedComments)
+    setRaw("cseddit_drafts", [])
+    setRaw("cseddit_current_user_id", "chloe_tan")
 
-    recalculateAllUsersStats();
+    recalculateAllUsersStats()
   }
 }
 
 export function resetDb(): void {
-  if (isServer) return;
-  localStorage.removeItem("cseddit_users");
-  localStorage.removeItem("cseddit_posts");
-  localStorage.removeItem("cseddit_answers");
-  localStorage.removeItem("cseddit_comments");
-  localStorage.removeItem("cseddit_drafts");
-  localStorage.removeItem("cseddit_current_user_id");
-  initializeDb(true);
+  if (isServer) return
+  localStorage.removeItem("cseddit_users")
+  localStorage.removeItem("cseddit_posts")
+  localStorage.removeItem("cseddit_answers")
+  localStorage.removeItem("cseddit_comments")
+  localStorage.removeItem("cseddit_drafts")
+  localStorage.removeItem("cseddit_current_user_id")
+  initializeDb(true)
 }
 
 export function getCurrentUserId(): string {
-  return getRaw<string>("cseddit_current_user_id", "chloe_tan");
+  return getRaw<string>("cseddit_current_user_id", "chloe_tan")
 }
 
 export function setCurrentUserId(userId: string): void {
-  setRaw("cseddit_current_user_id", userId);
+  setRaw("cseddit_current_user_id", userId)
 }
 
 export function getCurrentUser(): User | null {
-  const currentId = getCurrentUserId();
-  return getUserById(currentId);
+  const currentId = getCurrentUserId()
+  return getUserById(currentId)
 }
 
 export function getPosts(): Post[] {
-  initializeDb();
-  const posts = getRaw<Post[]>("cseddit_posts", []);
-  const users = getRaw<User[]>("cseddit_users", []);
-  return posts.map((p) => resolveAuthorInfo(p, users));
+  initializeDb()
+  const posts = getRaw<Post[]>("cseddit_posts", [])
+  const users = getRaw<User[]>("cseddit_users", [])
+  return posts.map((p) => resolveAuthorInfo(p, users))
 }
 
 export function getPostById(id: string): PostDetail | null {
-  initializeDb();
-  const posts = getRaw<Post[]>("cseddit_posts", []);
-  const post = posts.find((p) => p.id === id);
-  if (!post) return null;
+  initializeDb()
+  const posts = getRaw<Post[]>("cseddit_posts", [])
+  const post = posts.find((p) => p.id === id)
+  if (!post) return null
 
-  const users = getRaw<User[]>("cseddit_users", []);
-  const resolvedPost = resolveAuthorInfo(post, users);
+  const users = getRaw<User[]>("cseddit_users", [])
+  const resolvedPost = resolveAuthorInfo(post, users)
 
-  const answers = getRaw<Answer[]>("cseddit_answers", []);
-  const comments = getRaw<Comment[]>("cseddit_comments", []);
+  const answers = getRaw<Answer[]>("cseddit_answers", [])
+  const comments = getRaw<Comment[]>("cseddit_comments", [])
 
   const postComments = comments
     .filter((c) => c.parentId === id)
-    .map((c) => resolveAuthorInfo(c, users));
+    .map((c) => resolveAuthorInfo(c, users))
 
   const postAnswers = answers
     .filter((a) => a.postId === id)
     .map((a) => {
-      const resolvedAnswer = resolveAuthorInfo(a, users);
+      const resolvedAnswer = resolveAuthorInfo(a, users)
       return {
         ...resolvedAnswer,
         comments: comments
           .filter((c) => c.parentId === a.id)
           .map((c) => resolveAuthorInfo(c, users)),
-      };
-    });
+      }
+    })
 
   return {
     ...resolvedPost,
     comments: postComments,
     answers: postAnswers,
-  };
+  }
 }
 
 export function createPost(
-  postInput: Omit<Post, "id" | "timestamp" | "upvotes" | "downvotes" | "authorName" | "authorAvatar" | "isFeatured"> & { isFeatured?: boolean }
+  postInput: Omit<
+    Post,
+    | "id"
+    | "timestamp"
+    | "upvotes"
+    | "downvotes"
+    | "authorName"
+    | "authorAvatar"
+    | "isFeatured"
+  > & { isFeatured?: boolean }
 ): Post {
-  initializeDb();
-  const posts = getRaw<Post[]>("cseddit_posts", []);
-  const id = generateUUID();
+  initializeDb()
+  const posts = getRaw<Post[]>("cseddit_posts", [])
+  const id = generateUUID()
   const newPost: Post = {
     ...postInput,
     id,
@@ -373,61 +486,65 @@ export function createPost(
     authorName: "",
     authorAvatar: "",
     isFeatured: postInput.isFeatured ?? false,
-  };
-  posts.unshift(newPost);
-  setRaw("cseddit_posts", posts);
-  recalculateUserStats(postInput.authorId);
-  return newPost;
+  }
+  posts.unshift(newPost)
+  setRaw("cseddit_posts", posts)
+  recalculateUserStats(postInput.authorId)
+  const users = getRaw<User[]>("cseddit_users", [])
+  return resolveAuthorInfo(newPost, users)
 }
 
 export function updatePost(post: Post): void {
-  initializeDb();
-  const posts = getRaw<Post[]>("cseddit_posts", []);
-  const index = posts.findIndex((p) => p.id === post.id);
+  initializeDb()
+  const posts = getRaw<Post[]>("cseddit_posts", [])
+  const index = posts.findIndex((p) => p.id === post.id)
   if (index !== -1) {
-    const oldAuthorId = posts[index].authorId;
-    posts[index] = post;
-    setRaw("cseddit_posts", posts);
-    recalculateUserStats(post.authorId);
+    const oldAuthorId = posts[index].authorId
+    posts[index] = post
+    setRaw("cseddit_posts", posts)
+    recalculateUserStats(post.authorId)
     if (oldAuthorId !== post.authorId) {
-      recalculateUserStats(oldAuthorId);
+      recalculateUserStats(oldAuthorId)
     }
   }
 }
 
 export function deletePost(id: string): void {
-  initializeDb();
-  const posts = getRaw<Post[]>("cseddit_posts", []);
-  const post = posts.find((p) => p.id === id);
-  if (!post) return;
+  initializeDb()
+  const posts = getRaw<Post[]>("cseddit_posts", [])
+  const post = posts.find((p) => p.id === id)
+  if (!post) return
 
-  const updatedPosts = posts.filter((p) => p.id !== id);
-  setRaw("cseddit_posts", updatedPosts);
+  const updatedPosts = posts.filter((p) => p.id !== id)
+  setRaw("cseddit_posts", updatedPosts)
 
-  const answers = getRaw<Answer[]>("cseddit_answers", []);
-  const postAnswers = answers.filter((a) => a.postId === id);
-  const remainingAnswers = answers.filter((a) => a.postId !== id);
-  setRaw("cseddit_answers", remainingAnswers);
+  const answers = getRaw<Answer[]>("cseddit_answers", [])
+  const postAnswers = answers.filter((a) => a.postId === id)
+  const remainingAnswers = answers.filter((a) => a.postId !== id)
+  setRaw("cseddit_answers", remainingAnswers)
 
-  const comments = getRaw<Comment[]>("cseddit_comments", []);
-  const answerIds = postAnswers.map((a) => a.id);
+  const comments = getRaw<Comment[]>("cseddit_comments", [])
+  const answerIds = postAnswers.map((a) => a.id)
   const remainingComments = comments.filter(
     (c) => c.parentId !== id && !answerIds.includes(c.parentId)
-  );
-  setRaw("cseddit_comments", remainingComments);
+  )
+  setRaw("cseddit_comments", remainingComments)
 
-  recalculateUserStats(post.authorId);
+  recalculateUserStats(post.authorId)
   postAnswers.forEach((ans) => {
-    recalculateUserStats(ans.authorId);
-  });
+    recalculateUserStats(ans.authorId)
+  })
 }
 
 export function createAnswer(
-  answerInput: Omit<Answer, "id" | "timestamp" | "upvotes" | "downvotes" | "authorName" | "authorAvatar">
+  answerInput: Omit<
+    Answer,
+    "id" | "timestamp" | "upvotes" | "downvotes" | "authorName" | "authorAvatar"
+  >
 ): Answer {
-  initializeDb();
-  const answers = getRaw<Answer[]>("cseddit_answers", []);
-  const id = generateUUID();
+  initializeDb()
+  const answers = getRaw<Answer[]>("cseddit_answers", [])
+  const id = generateUUID()
   const newAnswer: Answer = {
     ...answerInput,
     id,
@@ -436,29 +553,34 @@ export function createAnswer(
     downvotes: [],
     authorName: "",
     authorAvatar: "",
-  };
-  answers.push(newAnswer);
-  setRaw("cseddit_answers", answers);
-  recalculateUserStats(answerInput.authorId);
-  return newAnswer;
+  }
+  answers.push(newAnswer)
+  setRaw("cseddit_answers", answers)
+  recalculateUserStats(answerInput.authorId)
+  const users = getRaw<User[]>("cseddit_users", [])
+  return resolveAuthorInfo(newAnswer, users)
 }
 
 export function createComment(
-  commentInput: Omit<Comment, "id" | "timestamp" | "authorName" | "authorAvatar">
+  commentInput: Omit<
+    Comment,
+    "id" | "timestamp" | "authorName" | "authorAvatar"
+  >
 ): Comment {
-  initializeDb();
-  const comments = getRaw<Comment[]>("cseddit_comments", []);
-  const id = generateUUID();
+  initializeDb()
+  const comments = getRaw<Comment[]>("cseddit_comments", [])
+  const id = generateUUID()
   const newComment: Comment = {
     ...commentInput,
     id,
     timestamp: Date.now(),
     authorName: "",
     authorAvatar: "",
-  };
-  comments.push(newComment);
-  setRaw("cseddit_comments", comments);
-  return newComment;
+  }
+  comments.push(newComment)
+  setRaw("cseddit_comments", comments)
+  const users = getRaw<User[]>("cseddit_users", [])
+  return resolveAuthorInfo(newComment, users)
 }
 
 export function votePost(
@@ -466,38 +588,38 @@ export function votePost(
   userId: string,
   type: "up" | "down"
 ): void {
-  if (!userId || userId === "anonymous") return;
-  initializeDb();
-  const posts = getRaw<Post[]>("cseddit_posts", []);
-  const post = posts.find((p) => p.id === postId);
-  if (!post) return;
-  if (post.authorId === userId) return;
+  if (!userId || userId === "anonymous") return
+  initializeDb()
+  const posts = getRaw<Post[]>("cseddit_posts", [])
+  const post = posts.find((p) => p.id === postId)
+  if (!post) return
+  if (post.authorId === userId) return
 
-  const alreadyUpvoted = post.upvotes.includes(userId);
-  const alreadyDownvoted = post.downvotes.includes(userId);
+  const alreadyUpvoted = post.upvotes.includes(userId)
+  const alreadyDownvoted = post.downvotes.includes(userId)
 
   if (type === "up") {
     if (alreadyUpvoted) {
-      post.upvotes = post.upvotes.filter((id) => id !== userId);
+      post.upvotes = post.upvotes.filter((id) => id !== userId)
     } else {
-      post.upvotes.push(userId);
+      post.upvotes.push(userId)
       if (alreadyDownvoted) {
-        post.downvotes = post.downvotes.filter((id) => id !== userId);
+        post.downvotes = post.downvotes.filter((id) => id !== userId)
       }
     }
   } else if (type === "down") {
     if (alreadyDownvoted) {
-      post.downvotes = post.downvotes.filter((id) => id !== userId);
+      post.downvotes = post.downvotes.filter((id) => id !== userId)
     } else {
-      post.downvotes.push(userId);
+      post.downvotes.push(userId)
       if (alreadyUpvoted) {
-        post.upvotes = post.upvotes.filter((id) => id !== userId);
+        post.upvotes = post.upvotes.filter((id) => id !== userId)
       }
     }
   }
 
-  setRaw("cseddit_posts", posts);
-  recalculateUserStats(post.authorId);
+  setRaw("cseddit_posts", posts)
+  recalculateUserStats(post.authorId)
 }
 
 export function voteAnswer(
@@ -505,105 +627,153 @@ export function voteAnswer(
   userId: string,
   type: "up" | "down"
 ): void {
-  if (!userId || userId === "anonymous") return;
-  initializeDb();
-  const answers = getRaw<Answer[]>("cseddit_answers", []);
-  const answer = answers.find((a) => a.id === answerId);
-  if (!answer) return;
-  if (answer.authorId === userId) return;
+  if (!userId || userId === "anonymous") return
+  initializeDb()
+  const answers = getRaw<Answer[]>("cseddit_answers", [])
+  const answer = answers.find((a) => a.id === answerId)
+  if (!answer) return
+  if (answer.authorId === userId) return
 
-  const alreadyUpvoted = answer.upvotes.includes(userId);
-  const alreadyDownvoted = answer.downvotes.includes(userId);
+  const alreadyUpvoted = answer.upvotes.includes(userId)
+  const alreadyDownvoted = answer.downvotes.includes(userId)
 
   if (type === "up") {
     if (alreadyUpvoted) {
-      answer.upvotes = answer.upvotes.filter((id) => id !== userId);
+      answer.upvotes = answer.upvotes.filter((id) => id !== userId)
     } else {
-      answer.upvotes.push(userId);
+      answer.upvotes.push(userId)
       if (alreadyDownvoted) {
-        answer.downvotes = answer.downvotes.filter((id) => id !== userId);
+        answer.downvotes = answer.downvotes.filter((id) => id !== userId)
       }
     }
   } else if (type === "down") {
     if (alreadyDownvoted) {
-      answer.downvotes = answer.downvotes.filter((id) => id !== userId);
+      answer.downvotes = answer.downvotes.filter((id) => id !== userId)
     } else {
-      answer.downvotes.push(userId);
+      answer.downvotes.push(userId)
       if (alreadyUpvoted) {
-        answer.upvotes = answer.upvotes.filter((id) => id !== userId);
+        answer.upvotes = answer.upvotes.filter((id) => id !== userId)
       }
     }
   }
 
-  setRaw("cseddit_answers", answers);
-  recalculateUserStats(answer.authorId);
+  setRaw("cseddit_answers", answers)
+  recalculateUserStats(answer.authorId)
+}
+
+export function votePoll(
+  postId: string,
+  optionIndex: number,
+  userId: string
+): Post | null {
+  if (!userId || userId === "anonymous") return null
+  initializeDb()
+  const posts = getRaw<Post[]>("cseddit_posts", [])
+  const postIndex = posts.findIndex((p) => p.id === postId)
+  if (postIndex === -1) return null
+
+  const post = posts[postIndex]
+  if (post.postType !== "poll" || !post.pollOptions) return null
+
+  const hasVoted = post.pollOptions.some((option) =>
+    option.votes.includes(userId)
+  )
+
+  if (!hasVoted) {
+    const option = post.pollOptions[optionIndex]
+    if (option) {
+      option.votes.push(userId)
+      setRaw("cseddit_posts", posts)
+    }
+  }
+
+  const users = getRaw<User[]>("cseddit_users", [])
+  return resolveAuthorInfo(post, users)
 }
 
 export function getUsers(): User[] {
-  initializeDb();
-  const users = getRaw<User[]>("cseddit_users", []);
-  return [...users].sort((a, b) => b.reputation - a.reputation);
+  initializeDb()
+  const users = getRaw<User[]>("cseddit_users", [])
+  return [...users].sort((a, b) => b.reputation - a.reputation)
 }
 
 export function getUserById(id: string): User | null {
-  initializeDb();
-  const users = getRaw<User[]>("cseddit_users", []);
-  return users.find((u) => u.id === id) || null;
+  initializeDb()
+  const users = getRaw<User[]>("cseddit_users", [])
+  return users.find((u) => u.id === id) || null
+}
+
+export function getAnswersByUser(
+  userId: string
+): (Answer & { postTitle: string })[] {
+  initializeDb()
+  const answers = getRaw<Answer[]>("cseddit_answers", [])
+  const posts = getRaw<Post[]>("cseddit_posts", [])
+  const users = getRaw<User[]>("cseddit_users", [])
+
+  return answers
+    .filter((a) => a.authorId === userId)
+    .map((a) => {
+      const resolved = resolveAuthorInfo(a, users)
+      const post = posts.find((p) => p.id === a.postId)
+      return { ...resolved, postTitle: post?.title ?? "Unknown question" }
+    })
+    .sort((a, b) => b.timestamp - a.timestamp)
 }
 
 export function updateUserProfile(
   id: string,
   data: Partial<User>
 ): User | null {
-  initializeDb();
-  const users = getRaw<User[]>("cseddit_users", []);
-  const index = users.findIndex((u) => u.id === id);
-  if (index === -1) return null;
+  initializeDb()
+  const users = getRaw<User[]>("cseddit_users", [])
+  const index = users.findIndex((u) => u.id === id)
+  if (index === -1) return null
 
   const updatedUser = {
     ...users[index],
     ...data,
     id,
-  };
-  users[index] = updatedUser;
-  setRaw("cseddit_users", users);
-  recalculateUserStats(id);
-  return updatedUser;
+  }
+  users[index] = updatedUser
+  setRaw("cseddit_users", users)
+  recalculateUserStats(id)
+  return updatedUser
 }
 
 export function getDrafts(): Draft[] {
-  initializeDb();
-  return getRaw<Draft[]>("cseddit_drafts", []);
+  initializeDb()
+  return getRaw<Draft[]>("cseddit_drafts", [])
 }
 
 export function saveDraft(
   draftInput: Omit<Draft, "id"> & { id?: string }
 ): Draft {
-  initializeDb();
-  const drafts = getRaw<Draft[]>("cseddit_drafts", []);
-  let id = draftInput.id;
+  initializeDb()
+  const drafts = getRaw<Draft[]>("cseddit_drafts", [])
+  let id = draftInput.id
   if (id) {
-    const index = drafts.findIndex((d) => d.id === id);
+    const index = drafts.findIndex((d) => d.id === id)
     if (index !== -1) {
-      drafts[index] = { ...draftInput, id };
-      setRaw("cseddit_drafts", drafts);
-      return drafts[index];
+      drafts[index] = { ...draftInput, id }
+      setRaw("cseddit_drafts", drafts)
+      return drafts[index]
     }
   }
 
-  id = generateUUID();
+  id = generateUUID()
   const newDraft: Draft = {
     ...draftInput,
     id,
-  };
-  drafts.push(newDraft);
-  setRaw("cseddit_drafts", drafts);
-  return newDraft;
+  }
+  drafts.push(newDraft)
+  setRaw("cseddit_drafts", drafts)
+  return newDraft
 }
 
 export function deleteDraft(id: string): void {
-  initializeDb();
-  const drafts = getRaw<Draft[]>("cseddit_drafts", []);
-  const updatedDrafts = drafts.filter((d) => d.id !== id);
-  setRaw("cseddit_drafts", updatedDrafts);
+  initializeDb()
+  const drafts = getRaw<Draft[]>("cseddit_drafts", [])
+  const updatedDrafts = drafts.filter((d) => d.id !== id)
+  setRaw("cseddit_drafts", updatedDrafts)
 }

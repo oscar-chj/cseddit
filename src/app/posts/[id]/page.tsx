@@ -1,23 +1,10 @@
 "use client"
 
-import React, { use, useEffect, useState, useCallback } from "react"
-import { useRouter } from "next/navigation"
-import { ArrowUpIcon, ArrowDownIcon, ShareIcon } from "@phosphor-icons/react"
-import {
-  getPostById,
-  votePost,
-  voteAnswer,
-  createAnswer,
-  createComment,
-  getCurrentUserId,
-} from "@/lib/mockDb"
-import { PostDetail, Comment } from "@/types"
-import { toast } from "sonner"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -25,18 +12,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Card, CardContent } from "@/components/ui/card"
-
-function formatTimeAgo(timestamp: number) {
-  const diff = Date.now() - timestamp
-  const mins = Math.floor(diff / 60000)
-  if (mins < 1) return "just now"
-  if (mins < 60) return `${mins}m ago`
-  const hours = Math.floor(mins / 60)
-  if (hours < 24) return `${hours}h ago`
-  const days = Math.floor(hours / 24)
-  return `${days}d ago`
-}
+import { Textarea } from "@/components/ui/textarea"
+import {
+  createAnswer,
+  createComment,
+  getCurrentUserId,
+  getPostById,
+  voteAnswer,
+  votePoll,
+  votePost,
+} from "@/lib/mockDb"
+import { formatTimeAgo } from "@/lib/postUtils"
+import { Comment, PostDetail } from "@/types"
+import {
+  ArrowDownIcon,
+  ArrowUpIcon,
+  CheckIcon,
+  LinkIcon,
+  ShareIcon,
+} from "@phosphor-icons/react"
+import { useRouter } from "next/navigation"
+import React, { use, useCallback, useEffect, useState } from "react"
+import { toast } from "sonner"
 
 interface InlineCommentSectionProps {
   parentId: string
@@ -117,12 +114,12 @@ function InlineCommentSection({
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
             placeholder="Add a helpful comment..."
-            className="h-8 text-xs focus-visible:ring-blue-500"
+            className="h-8 rounded-none text-xs focus-visible:ring-blue-500"
           />
           <Button
             type="submit"
             size="sm"
-            className="h-8 bg-blue-600 px-3 text-xs text-white hover:bg-blue-700"
+            className="h-8 rounded-none bg-blue-600 px-3 text-xs text-white hover:bg-blue-700"
           >
             Comment
           </Button>
@@ -131,7 +128,7 @@ function InlineCommentSection({
             variant="ghost"
             size="sm"
             onClick={() => setShowForm(false)}
-            className="h-8 px-2 text-xs text-muted-foreground"
+            className="h-8 rounded-none px-2 text-xs text-muted-foreground"
           >
             Cancel
           </Button>
@@ -212,7 +209,7 @@ export default function PostDetailPage({
   const handlePostAnswer = (e: React.FormEvent) => {
     e.preventDefault()
     if (!answerContent.trim()) {
-      toast.error("Please enter answer content")
+      toast.error("Enter answer content")
       return
     }
 
@@ -235,11 +232,11 @@ export default function PostDetailPage({
   if (!mounted || !postDetail) {
     return (
       <div className="mx-auto max-w-5xl animate-pulse space-y-6 px-4 py-6">
-        <div className="h-8 w-2/3 rounded bg-muted" />
-        <div className="h-4 w-1/3 rounded bg-muted" />
+        <div className="h-8 w-2/3 rounded-none bg-muted" />
+        <div className="h-4 w-1/3 rounded-none bg-muted" />
         <div className="flex gap-4">
-          <div className="h-24 w-10 rounded bg-muted" />
-          <div className="h-48 flex-1 rounded bg-muted" />
+          <div className="h-24 w-10 rounded-none bg-muted" />
+          <div className="h-48 flex-1 rounded-none bg-muted" />
         </div>
       </div>
     )
@@ -296,7 +293,7 @@ export default function PostDetailPage({
                 size="icon"
                 variant="ghost"
                 onClick={() => handlePostVote("up")}
-                className={`h-9 w-9 rounded-full border border-border ${
+                className={`h-9 w-9 rounded-none border border-border ${
                   hasUpvotedPost
                     ? "border-blue-200 bg-blue-50 text-blue-600"
                     : "text-muted-foreground"
@@ -312,7 +309,7 @@ export default function PostDetailPage({
                 size="icon"
                 variant="ghost"
                 onClick={() => handlePostVote("down")}
-                className={`h-9 w-9 rounded-full border border-border ${
+                className={`h-9 w-9 rounded-none border border-border ${
                   hasDownvotedPost
                     ? "border-red-200 bg-red-50 text-red-600"
                     : "text-muted-foreground"
@@ -327,9 +324,148 @@ export default function PostDetailPage({
 
             {/* Post text and tags */}
             <div className="flex-1 space-y-4">
-              <p className="text-sm leading-relaxed whitespace-pre-line text-foreground">
-                {postDetail.content}
-              </p>
+              {/* Dynamic Post Type Content */}
+              {postDetail.postType === "image" && (
+                <div className="space-y-4">
+                  {postDetail.mediaUrl && (
+                    <img
+                      src={postDetail.mediaUrl}
+                      alt={postDetail.title}
+                      className="max-h-[450px] w-auto rounded-none border border-border object-contain"
+                    />
+                  )}
+                  {postDetail.content && (
+                    <p className="text-sm leading-relaxed whitespace-pre-line text-foreground">
+                      {postDetail.content}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {postDetail.postType === "link" && (
+                <div className="space-y-4">
+                  {postDetail.mediaUrl && (
+                    <a
+                      href={postDetail.mediaUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 rounded-none border border-border bg-muted/30 p-4 text-blue-600 transition-colors hover:bg-muted/50 hover:underline"
+                    >
+                      <LinkIcon className="h-5 w-5 shrink-0" />
+                      <span className="truncate text-sm font-medium">
+                        {postDetail.mediaUrl}
+                      </span>
+                    </a>
+                  )}
+                  {postDetail.content && (
+                    <p className="text-sm leading-relaxed whitespace-pre-line text-foreground">
+                      {postDetail.content}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {postDetail.postType === "poll" && (
+                <div className="space-y-4">
+                  <div className="space-y-2 rounded-none border border-border bg-card p-4">
+                    {(() => {
+                      const totalVotes = postDetail.pollOptions
+                        ? postDetail.pollOptions.reduce(
+                            (acc, opt) => acc + opt.votes.length,
+                            0
+                          )
+                        : 0
+                      const userVotedOptionIndex = postDetail.pollOptions
+                        ? postDetail.pollOptions.findIndex((opt) =>
+                            opt.votes.includes(currentUserId)
+                          )
+                        : -1
+                      const hasVoted = userVotedOptionIndex !== -1
+
+                      if (hasVoted) {
+                        return (
+                          <div className="space-y-3">
+                            {postDetail.pollOptions?.map((option, idx) => {
+                              const pct =
+                                totalVotes > 0
+                                  ? Math.round(
+                                      (option.votes.length / totalVotes) * 100
+                                    )
+                                  : 0
+                              const isSelected = idx === userVotedOptionIndex
+                              return (
+                                <div
+                                  key={idx}
+                                  className="relative flex h-12 items-center justify-between overflow-hidden rounded-none border border-border p-3"
+                                >
+                                  <div
+                                    className="absolute top-0 bottom-0 left-0 bg-blue-100 transition-all duration-300 dark:bg-blue-900/30"
+                                    style={{ width: `${pct}%` }}
+                                  />
+                                  <div className="relative z-10 flex items-center gap-2 text-sm font-medium text-foreground">
+                                    {option.text}
+                                    {isSelected && (
+                                      <CheckIcon className="h-4 w-4 shrink-0 font-bold text-blue-600" />
+                                    )}
+                                  </div>
+                                  <div className="relative z-10 text-xs font-semibold text-muted-foreground">
+                                    {pct}% ({option.votes.length}{" "}
+                                    {option.votes.length === 1
+                                      ? "vote"
+                                      : "votes"}
+                                    )
+                                  </div>
+                                </div>
+                              )
+                            })}
+                            <div className="pt-1 text-xs text-muted-foreground">
+                              Total votes: {totalVotes}
+                            </div>
+                          </div>
+                        )
+                      } else {
+                        return (
+                          <div className="space-y-2">
+                            {postDetail.pollOptions?.map((option, idx) => (
+                              <Button
+                                key={idx}
+                                variant="outline"
+                                onClick={() => {
+                                  if (currentUserId === "anonymous") {
+                                    toast.error("Anonymous users cannot vote")
+                                    return
+                                  }
+                                  votePoll(postDetail.id, idx, currentUserId)
+                                  toast("Vote registered")
+                                  loadData()
+                                }}
+                                className="h-auto w-full justify-start rounded-none border-border px-3 py-2 text-left text-sm font-normal hover:bg-muted/50"
+                              >
+                                {option.text}
+                              </Button>
+                            ))}
+                            <div className="pt-1 text-xs text-muted-foreground">
+                              Total votes: {totalVotes}
+                            </div>
+                          </div>
+                        )
+                      }
+                    })()}
+                  </div>
+                  {postDetail.content && (
+                    <p className="text-sm leading-relaxed whitespace-pre-line text-foreground">
+                      {postDetail.content}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {(!postDetail.postType || postDetail.postType === "text") &&
+                postDetail.content && (
+                  <p className="text-sm leading-relaxed whitespace-pre-line text-foreground">
+                    {postDetail.content}
+                  </p>
+                )}
 
               {/* Tags list */}
               <div className="flex flex-wrap gap-1.5">
@@ -376,7 +512,7 @@ export default function PostDetailPage({
                 value={sortBy}
                 onValueChange={(val) => setSortBy(val as "top" | "latest")}
               >
-                <SelectTrigger className="h-8 w-[140px] border-border text-xs">
+                <SelectTrigger className="h-8 w-[140px] rounded-none border-border text-xs">
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
@@ -402,7 +538,7 @@ export default function PostDetailPage({
                 return (
                   <div
                     key={answer.id}
-                    className="flex gap-4 rounded-lg border border-border bg-card p-4"
+                    className="flex gap-4 rounded-none border border-border bg-card p-4"
                   >
                     {/* Vote Sidebar */}
                     <div className="flex flex-col items-center gap-1 pt-1">
@@ -412,7 +548,7 @@ export default function PostDetailPage({
                         onClick={() =>
                           handleAnswerVote(answer.id, answer.authorId, "up")
                         }
-                        className={`h-8 w-8 rounded-full border border-border ${
+                        className={`h-8 w-8 rounded-none border border-border ${
                           hasUpvotedAnswer
                             ? "border-blue-200 bg-blue-50 text-blue-600"
                             : "text-muted-foreground"
@@ -432,7 +568,7 @@ export default function PostDetailPage({
                         onClick={() =>
                           handleAnswerVote(answer.id, answer.authorId, "down")
                         }
-                        className={`h-8 w-8 rounded-full border border-border ${
+                        className={`h-8 w-8 rounded-none border border-border ${
                           hasDownvotedAnswer
                             ? "border-red-200 bg-red-50 text-red-600"
                             : "text-muted-foreground"
@@ -487,11 +623,11 @@ export default function PostDetailPage({
                 placeholder="Write your answer details here. Be specific and provide code examples..."
                 value={answerContent}
                 onChange={(e) => setAnswerContent(e.target.value)}
-                className="min-h-[160px] border-border p-4 text-sm focus-visible:ring-blue-500"
+                className="min-h-[160px] rounded-none border-border p-4 text-sm focus-visible:ring-blue-500"
               />
               <Button
                 type="submit"
-                className="bg-blue-600 text-white hover:bg-blue-700"
+                className="rounded-none bg-blue-600 text-white hover:bg-blue-700"
               >
                 Post Answer
               </Button>
@@ -501,7 +637,7 @@ export default function PostDetailPage({
 
         {/* Right column: Sticky guidelines / tips */}
         <div className="space-y-6 lg:col-span-3">
-          <Card className="border-border bg-muted/20">
+          <Card className="rounded-none border-border bg-muted/20">
             <CardContent className="space-y-3 p-4">
               <h3 className="text-xs font-bold tracking-wider text-foreground uppercase">
                 Peer Review Tips

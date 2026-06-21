@@ -1,109 +1,128 @@
-"use client";
+"use client"
 
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
-import { ArrowUpIcon, ChatIcon } from "@phosphor-icons/react";
-import { getPosts } from "@/lib/mockDb";
-import { Post } from "@/types";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-
-function formatTimeAgo(timestamp: number) {
-  const diff = Date.now() - timestamp;
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "just now";
-  if (mins < 60) return `${mins}m ago`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
-}
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { getCurrentUserId, getPosts, votePost } from "@/lib/mockDb"
+import { formatTimeAgo, getPostTypeIcon } from "@/lib/postUtils"
+import { Post } from "@/types"
+import { ArrowDownIcon, ArrowUpIcon, ChatIcon } from "@phosphor-icons/react"
+import Link from "next/link"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
 
 export default function Dashboard() {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [activeTab, setActiveTab] = useState<"latest" | "trending">("latest");
-  const [visibleCount, setVisibleCount] = useState(5);
-  const [mounted, setMounted] = useState(false);
+  const [posts, setPosts] = useState<Post[]>([])
+  const [activeTab, setActiveTab] = useState<"latest" | "trending">("latest")
+  const [visibleCount, setVisibleCount] = useState(5)
+  const [mounted, setMounted] = useState(false)
+  const [currentUserId, setCurrentUserId] = useState("")
 
   useEffect(() => {
-    const allPosts = getPosts();
+    const allPosts = getPosts()
     setTimeout(() => {
-      setMounted(true);
-      setPosts(allPosts);
-    }, 0);
-  }, []);
+      setMounted(true)
+      setPosts(allPosts)
+      setCurrentUserId(getCurrentUserId())
+    }, 0)
+  }, [])
+
+  const handleVote = (
+    postId: string,
+    type: "up" | "down",
+    authorId: string
+  ) => {
+    if (currentUserId === "anonymous") {
+      toast.error("Anonymous users cannot vote")
+      return
+    }
+    if (authorId === currentUserId) {
+      toast.error("You cannot vote on your own question")
+      return
+    }
+    votePost(postId, currentUserId, type)
+    const allPosts = getPosts()
+    setPosts(allPosts)
+    toast("Vote recorded")
+  }
 
   if (!mounted) {
     return (
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 space-y-8 animate-pulse">
-        <div className="h-6 w-48 bg-muted rounded" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="mx-auto max-w-7xl animate-pulse space-y-8 px-4 py-6 sm:px-6">
+        <div className="h-6 w-48 rounded-none bg-muted" />
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 bg-muted rounded-lg" />
+            <div key={i} className="h-32 rounded-none bg-muted" />
           ))}
         </div>
-        <div className="h-10 w-full bg-muted rounded" />
+        <div className="h-10 w-full rounded-none bg-muted" />
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-24 bg-muted rounded" />
+            <div key={i} className="h-24 rounded-none bg-muted" />
           ))}
         </div>
       </div>
-    );
+    )
   }
 
   // Filter posts
-  const featuredPosts = posts.filter((p) => p.isFeatured).slice(0, 3);
-  const feedPosts = [...posts];
+  const featuredPosts = posts.filter((p) => p.isFeatured).slice(0, 3)
+  const feedPosts = [...posts]
 
   if (activeTab === "latest") {
-    feedPosts.sort((a, b) => b.timestamp - a.timestamp);
+    feedPosts.sort((a, b) => b.timestamp - a.timestamp)
   } else {
     feedPosts.sort((a, b) => {
-      const scoreA = a.upvotes.length - a.downvotes.length;
-      const scoreB = b.upvotes.length - b.downvotes.length;
-      return scoreB - scoreA;
-    });
+      const scoreA = a.upvotes.length - a.downvotes.length
+      const scoreB = b.upvotes.length - b.downvotes.length
+      return scoreB - scoreA
+    })
   }
 
-  const displayedPosts = feedPosts.slice(0, visibleCount);
+  const displayedPosts = feedPosts.slice(0, visibleCount)
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 space-y-8">
+    <div className="mx-auto max-w-7xl space-y-8 px-4 py-6 sm:px-6">
       {/* Featured Section */}
       <div>
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+        <h2 className="mb-4 text-sm font-semibold tracking-wider text-muted-foreground uppercase">
           Featured Questions
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {featuredPosts.map((post) => {
-            const score = post.upvotes.length - post.downvotes.length;
+            const score = post.upvotes.length - post.downvotes.length
             return (
-              <Card key={post.id} className="border-border hover:border-blue-500/50 transition-colors flex flex-col justify-between">
+              <Card
+                key={post.id}
+                className="flex flex-col justify-between rounded-none border-border transition-colors hover:border-blue-500/50"
+              >
                 <CardHeader className="p-4 pb-2">
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Avatar className="h-6 w-6">
-                        <AvatarFallback className="text-[10px] bg-blue-100 text-blue-800">
+                        <AvatarFallback className="bg-blue-100 text-[10px] text-blue-800">
                           {post.authorAvatar}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="text-xs text-muted-foreground font-medium truncate max-w-[120px]">
+                      <span className="max-w-[120px] truncate text-xs font-medium text-muted-foreground">
                         {post.authorName}
                       </span>
                     </div>
-                    <Badge variant="secondary" className="text-[10px] font-normal px-2 bg-blue-50 text-blue-700 hover:bg-blue-50 border-none">
+                    <Badge
+                      variant="secondary"
+                      className="border-none bg-blue-50 px-2 text-[10px] font-normal text-blue-700 hover:bg-blue-50"
+                    >
                       {post.tags[0]}
                     </Badge>
                   </div>
-                  <CardTitle className="text-sm font-bold line-clamp-2 hover:text-blue-600 transition-colors">
+                  <CardTitle className="line-clamp-2 flex items-center gap-1.5 text-sm font-bold transition-colors hover:text-blue-600">
+                    {getPostTypeIcon(post.postType)}
                     <Link href={`/posts/${post.id}`}>{post.title}</Link>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-4 pt-0 text-xs text-muted-foreground flex items-center justify-between mt-auto">
+                <CardContent className="mt-auto flex items-center justify-between p-4 pt-0 text-xs text-muted-foreground">
                   <span>{formatTimeAgo(post.timestamp)}</span>
                   <div className="flex items-center gap-3">
                     <span className="flex items-center gap-1 font-medium text-foreground">
@@ -113,26 +132,34 @@ export default function Dashboard() {
                   </div>
                 </CardContent>
               </Card>
-            );
+            )
           })}
         </div>
       </div>
 
       {/* Main feed list */}
       <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-3">
-          <h2 className="text-lg font-bold text-foreground">Recent Discussions</h2>
+        <div className="flex flex-col gap-4 border-b border-border pb-3 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="text-lg font-bold text-foreground">
+            Recent Discussions
+          </h2>
           <Tabs
             defaultValue="latest"
             value={activeTab}
             onValueChange={(val) => setActiveTab(val as "latest" | "trending")}
             className="w-full sm:w-auto"
           >
-            <TabsList className="grid grid-cols-2 w-full sm:w-[200px] h-9">
-              <TabsTrigger value="latest" className="text-xs data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+            <TabsList className="grid h-9 w-full grid-cols-2 sm:w-[200px]">
+              <TabsTrigger
+                value="latest"
+                className="text-xs data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              >
                 Latest
               </TabsTrigger>
-              <TabsTrigger value="trending" className="text-xs data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <TabsTrigger
+                value="trending"
+                className="text-xs data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              >
                 Trending
               </TabsTrigger>
             </TabsList>
@@ -140,85 +167,169 @@ export default function Dashboard() {
         </div>
 
         {/* Chronological feed post cards */}
-        <div className="divide-y divide-border border rounded-lg overflow-hidden bg-card">
+        <div className="divide-y divide-border overflow-hidden rounded-none border bg-card">
           {displayedPosts.length === 0 ? (
-            <div className="p-8 text-center text-muted-foreground text-sm">
+            <div className="p-8 text-center text-sm text-muted-foreground">
               No discussions found.
             </div>
           ) : (
             displayedPosts.map((post) => {
-              const score = post.upvotes.length - post.downvotes.length;
+              const score = post.upvotes.length - post.downvotes.length
               return (
                 <div
                   key={post.id}
-                  className="p-5 hover:bg-muted/30 transition-colors flex flex-col md:flex-row md:items-start gap-4"
+                  className="flex flex-col gap-4 p-5 transition-colors hover:bg-muted/30 md:flex-row md:items-start"
                 >
                   {/* Scores Sidebar (Desktop) */}
-                  <div className="hidden md:flex flex-col items-center justify-center gap-1 text-center min-w-[70px] py-1 bg-muted/40 rounded-md border border-border">
-                    <span className="text-sm font-bold text-foreground">{score}</span>
-                    <span className="text-[10px] text-muted-foreground uppercase font-medium">votes</span>
+                  <div className="hidden min-w-[40px] flex-col items-center justify-center gap-1.5 rounded-none bg-transparent py-1 text-center md:flex">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => handleVote(post.id, "up", post.authorId)}
+                      className={`h-7 w-7 rounded-none ${
+                        post.upvotes.includes(currentUserId)
+                          ? "bg-blue-50/50 text-blue-600"
+                          : "text-muted-foreground hover:text-blue-600"
+                      }`}
+                    >
+                      <ArrowUpIcon
+                        className="h-4 w-4"
+                        weight={
+                          post.upvotes.includes(currentUserId)
+                            ? "bold"
+                            : "regular"
+                        }
+                      />
+                    </Button>
+                    <span className="text-xs font-bold text-foreground">
+                      {score}
+                    </span>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => handleVote(post.id, "down", post.authorId)}
+                      className={`h-7 w-7 rounded-none ${
+                        post.downvotes.includes(currentUserId)
+                          ? "bg-red-50/50 text-red-600"
+                          : "text-muted-foreground hover:text-red-600"
+                      }`}
+                    >
+                      <ArrowDownIcon
+                        className="h-4 w-4"
+                        weight={
+                          post.downvotes.includes(currentUserId)
+                            ? "bold"
+                            : "regular"
+                        }
+                      />
+                    </Button>
                   </div>
 
                   {/* Main content body */}
                   <div className="flex-1 space-y-2">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                       <Avatar className="h-5 w-5">
-                        <AvatarFallback className="text-[8px] bg-blue-100 text-blue-800">
+                        <AvatarFallback className="bg-blue-100 text-[8px] text-blue-800">
                           {post.authorAvatar}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="font-semibold text-foreground">{post.authorName}</span>
+                      <span className="font-semibold text-foreground">
+                        {post.authorName}
+                      </span>
                       <span>•</span>
                       <span>{formatTimeAgo(post.timestamp)}</span>
                       {post.isFeatured && (
                         <>
                           <span>•</span>
-                          <span className="inline-flex items-center gap-0.5 text-blue-600 font-bold bg-blue-50 px-1.5 py-0.5 rounded text-[10px]">
+                          <span className="inline-flex items-center gap-0.5 rounded-none bg-blue-50 px-1.5 py-0.5 text-[10px] font-bold text-blue-600">
                             Featured
                           </span>
                         </>
                       )}
                     </div>
 
-                    <Link href={`/posts/${post.id}`} className="block group">
-                      <h3 className="text-base font-bold text-foreground group-hover:text-blue-600 transition-colors">
+                    <Link href={`/posts/${post.id}`} className="group block">
+                      <h3 className="flex items-center gap-1.5 text-base font-bold text-foreground transition-colors group-hover:text-blue-600">
+                        {getPostTypeIcon(post.postType)}
                         {post.title}
                       </h3>
-                      <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                      <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
                         {post.content}
                       </p>
                     </Link>
 
-                    <div className="flex items-center justify-between flex-wrap gap-2 pt-1">
+                    <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
                       {/* Tags */}
-                      <div className="flex items-center gap-1.5 flex-wrap">
+                      <div className="flex flex-wrap items-center gap-1.5">
                         {post.tags.map((tag) => (
                           <Badge
                             key={tag}
                             variant="outline"
-                            className="text-xs font-normal text-muted-foreground border-border hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                            className="border-border text-xs font-normal text-muted-foreground transition-colors hover:bg-blue-50 hover:text-blue-600"
                           >
                             {tag}
                           </Badge>
                         ))}
                       </div>
 
-                      {/* Vote/Comments summary for mobile */}
+                      {/* Vote summary for mobile */}
                       <div className="flex items-center gap-3 text-xs text-muted-foreground md:hidden">
-                        <span className="flex items-center gap-1">
-                          <ArrowUpIcon className="h-3.5 w-3.5" />
-                          {score}
-                        </span>
+                        <div className="flex h-7 items-center overflow-hidden rounded-none bg-transparent">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() =>
+                              handleVote(post.id, "up", post.authorId)
+                            }
+                            className={`h-7 w-7 rounded-none ${
+                              post.upvotes.includes(currentUserId)
+                                ? "bg-blue-50/50 text-blue-600"
+                                : "text-muted-foreground"
+                            }`}
+                          >
+                            <ArrowUpIcon
+                              className="h-3.5 w-3.5"
+                              weight={
+                                post.upvotes.includes(currentUserId)
+                                  ? "bold"
+                                  : "regular"
+                              }
+                            />
+                          </Button>
+                          <span className="px-2 text-xs font-bold text-foreground">
+                            {score}
+                          </span>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() =>
+                              handleVote(post.id, "down", post.authorId)
+                            }
+                            className={`h-7 w-7 rounded-none ${
+                              post.downvotes.includes(currentUserId)
+                                ? "bg-red-50/50 text-red-600"
+                                : "text-muted-foreground"
+                            }`}
+                          >
+                            <ArrowDownIcon
+                              className="h-3.5 w-3.5"
+                              weight={
+                                post.downvotes.includes(currentUserId)
+                                  ? "bold"
+                                  : "regular"
+                              }
+                            />
+                          </Button>
+                        </div>
                         <span className="flex items-center gap-1">
                           <ChatIcon className="h-3.5 w-3.5" />
-                          {/* answers are fetched client-side but we can keep it simple or look it up */}
                           Answer
                         </span>
                       </div>
                     </div>
                   </div>
                 </div>
-              );
+              )
             })
           )}
         </div>
@@ -230,7 +341,7 @@ export default function Dashboard() {
               variant="outline"
               size="sm"
               onClick={() => setVisibleCount((prev) => prev + 5)}
-              className="border-border hover:bg-blue-50 hover:text-blue-600 transition-colors"
+              className="rounded-none border-border transition-colors hover:bg-blue-50 hover:text-blue-600"
             >
               Load more
             </Button>
@@ -238,5 +349,5 @@ export default function Dashboard() {
         )}
       </div>
     </div>
-  );
+  )
 }
