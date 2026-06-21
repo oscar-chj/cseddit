@@ -3,7 +3,7 @@
 import React, { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ArrowUp, ArrowDown, Chat } from "@phosphor-icons/react";
+import { ArrowUp, Chat } from "@phosphor-icons/react";
 import { getPosts } from "@/lib/mockDb";
 import { Post } from "@/types";
 import { Badge } from "@/components/ui/badge";

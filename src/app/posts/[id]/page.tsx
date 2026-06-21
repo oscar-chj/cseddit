@@ -1,16 +1,11 @@
 "use client";
 
-import React, { use, useEffect, useState } from "react";
-import Link from "next/link";
+import React, { use, useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowUp,
   ArrowDown,
-  Chat,
-  Plus,
-  Share,
-  Chats,
-  Circle
+  Share
 } from "@phosphor-icons/react";
 import {
   getPostById,
@@ -21,7 +16,7 @@ import {
   getCurrentUserId,
   getUserById
 } from "@/lib/mockDb";
-import { PostDetail, AnswerWithComments, Comment } from "@/types";
+import { PostDetail, Comment } from "@/types";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -146,7 +141,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
   const [mounted, setMounted] = useState(false);
   const [currentUserId, setCurrentUserIdState] = useState("");
 
-  const loadData = () => {
+  const loadData = useCallback(() => {
     const detail = getPostById(postId);
     if (!detail) {
       toast.error("Question not found");
@@ -155,12 +150,12 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: strin
     }
     setPostDetail(detail);
     setCurrentUserIdState(getCurrentUserId());
-  };
+  }, [postId, router]);
 
   useEffect(() => {
     setMounted(true);
     loadData();
-  }, [postId]);
+  }, [loadData]);
 
   const handlePostVote = (type: "up" | "down") => {
     if (!postDetail) return;

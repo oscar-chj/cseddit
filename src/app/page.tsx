@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowUp, ArrowDown, Chat, Trophy } from "@phosphor-icons/react";
+import { ArrowUp, Chat } from "@phosphor-icons/react";
 import { getPosts } from "@/lib/mockDb";
 import { Post } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
