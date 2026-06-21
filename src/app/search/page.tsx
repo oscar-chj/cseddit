@@ -272,10 +272,10 @@ export default function SearchResultsPage() {
     <Suspense
       fallback={
         <div className="mx-auto max-w-7xl animate-pulse space-y-6 px-4 py-6 sm:px-6">
-          <div className="h-6 w-64 rounded bg-muted" />
+          <div className="h-6 w-64 rounded-none bg-muted" />
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-24 rounded bg-muted" />
+              <div key={i} className="h-24 rounded-none bg-muted" />
             ))}
           </div>
         </div>

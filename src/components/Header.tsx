@@ -62,7 +62,7 @@ export default function Header() {
           <div className="flex items-center gap-6">
             <span className="text-lg font-bold text-blue-600">CSeddit</span>
           </div>
-          <div className="h-8 w-8 animate-pulse rounded-full bg-muted" />
+          <div className="h-8 w-8 animate-pulse rounded-none bg-muted" />
         </div>
       </header>
     )
@@ -148,7 +148,7 @@ export default function Header() {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="relative h-9 w-9 rounded-full border border-muted/50 p-0"
+                  className="relative h-9 w-9 rounded-none border border-muted/50 p-0"
                 >
                   <Avatar className="flex h-8 w-8 items-center justify-center">
                     <AvatarFallback className="bg-blue-100 text-base font-semibold text-blue-800">
@@ -198,7 +198,7 @@ export default function Header() {
                       <span>{user.name}</span>
                     </div>
                     {user.id === currentUser.id && (
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                      <span className="h-1.5 w-1.5 rounded-none bg-blue-500" />
                     )}
                   </DropdownMenuItem>
                 ))}
