@@ -31,7 +31,9 @@ export default function UserProfilePage() {
 
   const [user, setUser] = useState<User | null>(null)
   const [userPosts, setUserPosts] = useState<Post[]>([])
-  const [userAnswers, setUserAnswers] = useState<(Answer & { postTitle: string })[]>([])
+  const [userAnswers, setUserAnswers] = useState<
+    (Answer & { postTitle: string })[]
+  >([])
   const [mounted, setMounted] = useState(false)
   const [currentUserId, setCurrentUserId] = useState("")
 
@@ -220,8 +222,7 @@ export default function UserProfilePage() {
       <div className="space-y-4">
         <h2 className="flex items-center gap-2 border-b border-border pb-2 text-base font-bold text-foreground">
           <BookOpenIcon className="h-5 w-5 text-blue-600" />
-          {isOwnProfile ? "My Questions" : `${user.name}'s Questions`} (
-          {userPosts.length})
+          Questions ({userPosts.length})
         </h2>
 
         {userPosts.length === 0 ? (
@@ -282,8 +283,7 @@ export default function UserProfilePage() {
       <div className="space-y-4 pt-4">
         <h2 className="flex items-center gap-2 border-b border-border pb-2 text-base font-bold text-foreground">
           <ChatTeardropTextIcon className="h-5 w-5 text-blue-600" />
-          {isOwnProfile ? "My Answers" : `${user.name}'s Answers`} (
-          {userAnswers.length})
+          Answers ({userAnswers.length})
         </h2>
 
         {userAnswers.length === 0 ? (
@@ -295,13 +295,14 @@ export default function UserProfilePage() {
         ) : (
           <div className="divide-y divide-border overflow-hidden rounded-none border bg-card">
             {userAnswers.map((answer) => {
-              const answerScore = answer.upvotes.length - answer.downvotes.length
+              const answerScore =
+                answer.upvotes.length - answer.downvotes.length
               return (
                 <div
                   key={answer.id}
                   className="flex items-start justify-between gap-4 p-4 transition-colors hover:bg-muted/30 sm:p-5"
                 >
-                  <div className="flex-1 min-w-0 space-y-1.5">
+                  <div className="min-w-0 flex-1 space-y-1.5">
                     <Link
                       href={`/posts/${answer.postId}`}
                       className="block truncate text-sm font-semibold text-foreground transition-colors hover:text-blue-600 sm:text-base"
@@ -316,11 +317,11 @@ export default function UserProfilePage() {
                     </span>
                   </div>
 
-                  <div className="flex shrink-0 min-w-[60px] flex-col items-center justify-center rounded-none border border-border bg-muted/40 px-3 py-1.5 text-center">
+                  <div className="flex min-w-[60px] shrink-0 flex-col items-center justify-center rounded-none border border-border bg-muted/40 px-3 py-1.5 text-center">
                     <span className="text-xs font-bold text-foreground">
                       {answerScore}
                     </span>
-                    <span className="mt-0.5 text-[9px] font-medium uppercase text-muted-foreground">
+                    <span className="mt-0.5 text-[9px] font-medium text-muted-foreground uppercase">
                       votes
                     </span>
                   </div>
