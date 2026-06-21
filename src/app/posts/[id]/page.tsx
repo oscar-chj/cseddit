@@ -27,17 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Card, CardContent } from "@/components/ui/card"
-
-function formatTimeAgo(timestamp: number) {
-  const diff = Date.now() - timestamp
-  const mins = Math.floor(diff / 60000)
-  if (mins < 1) return "just now"
-  if (mins < 60) return `${mins}m ago`
-  const hours = Math.floor(mins / 60)
-  if (hours < 24) return `${hours}h ago`
-  const days = Math.floor(hours / 24)
-  return `${days}d ago`
-}
+import { formatTimeAgo } from "@/lib/utils"
 
 interface InlineCommentSectionProps {
   parentId: string
@@ -292,12 +282,12 @@ export default function PostDetailPage({
           {/* Question Details */}
           <div className="flex gap-4">
             {/* Voting block */}
-            <div className="flex flex-col items-center gap-1.5 pt-1">
+             <div className="flex flex-col items-center gap-1.5 pt-1">
               <Button
                 size="icon"
                 variant="ghost"
                 onClick={() => handlePostVote("up")}
-                className={`h-9 w-9 rounded-full border border-border ${
+                className={`h-9 w-9 rounded-none border border-border ${
                   hasUpvotedPost
                     ? "border-blue-200 bg-blue-50 text-blue-600"
                     : "text-muted-foreground"
@@ -313,7 +303,7 @@ export default function PostDetailPage({
                 size="icon"
                 variant="ghost"
                 onClick={() => handlePostVote("down")}
-                className={`h-9 w-9 rounded-full border border-border ${
+                className={`h-9 w-9 rounded-none border border-border ${
                   hasDownvotedPost
                     ? "border-red-200 bg-red-50 text-red-600"
                     : "text-muted-foreground"
@@ -547,7 +537,7 @@ export default function PostDetailPage({
                         onClick={() =>
                           handleAnswerVote(answer.id, answer.authorId, "up")
                         }
-                        className={`h-8 w-8 rounded-full border border-border ${
+                        className={`h-8 w-8 rounded-none border border-border ${
                           hasUpvotedAnswer
                             ? "border-blue-200 bg-blue-50 text-blue-600"
                             : "text-muted-foreground"
@@ -567,7 +557,7 @@ export default function PostDetailPage({
                         onClick={() =>
                           handleAnswerVote(answer.id, answer.authorId, "down")
                         }
-                        className={`h-8 w-8 rounded-full border border-border ${
+                        className={`h-8 w-8 rounded-none border border-border ${
                           hasDownvotedAnswer
                             ? "border-red-200 bg-red-50 text-red-600"
                             : "text-muted-foreground"

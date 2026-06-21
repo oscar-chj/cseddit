@@ -11,24 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-
-function formatTimeAgo(timestamp: number) {
-  const diff = Date.now() - timestamp;
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "just now";
-  if (mins < 60) return `${mins}m ago`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
-}
-
-function getPostTypeIcon(postType?: string) {
-  if (postType === "image") return <ImageIcon className="h-4 w-4 text-muted-foreground shrink-0" />;
-  if (postType === "link") return <LinkIcon className="h-4 w-4 text-muted-foreground shrink-0" />;
-  if (postType === "poll") return <ChartBarIcon className="h-4 w-4 text-muted-foreground shrink-0" />;
-  return null;
-}
+import { formatTimeAgo, getPostTypeIcon } from "@/lib/utils";
 
 export default function Dashboard() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -64,16 +47,16 @@ export default function Dashboard() {
   if (!mounted) {
     return (
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 space-y-8 animate-pulse">
-        <div className="h-6 w-48 bg-muted rounded" />
+        <div className="h-6 w-48 bg-muted rounded-none" />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 bg-muted rounded-lg" />
+            <div key={i} className="h-32 bg-muted rounded-none" />
           ))}
         </div>
-        <div className="h-10 w-full bg-muted rounded" />
+        <div className="h-10 w-full bg-muted rounded-none" />
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-24 bg-muted rounded" />
+            <div key={i} className="h-24 bg-muted rounded-none" />
           ))}
         </div>
       </div>
@@ -228,7 +211,7 @@ export default function Dashboard() {
                       {post.isFeatured && (
                         <>
                           <span>•</span>
-                          <span className="inline-flex items-center gap-0.5 text-blue-600 font-bold bg-blue-50 px-1.5 py-0.5 rounded text-[10px]">
+                          <span className="inline-flex items-center gap-0.5 text-blue-600 font-bold bg-blue-50 px-1.5 py-0.5 rounded-none text-[10px]">
                             Featured
                           </span>
                         </>
