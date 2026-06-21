@@ -10,6 +10,9 @@ export interface User {
   likes: number;
   dislikes: number;
   anonymousByDefault: boolean;
+  department: string;
+  course: string;
+  yearOfStudy: string;
 }
 
 export interface Post {
@@ -24,6 +27,9 @@ export interface Post {
   upvotes: string[]; // array of userIds who upvoted
   downvotes: string[]; // array of userIds who downvoted
   isFeatured: boolean;
+  postType?: "text" | "image" | "link" | "poll";
+  mediaUrl?: string;
+  pollOptions?: { text: string; votes: string[] }[];
 }
 
 export interface Answer {
@@ -54,6 +60,9 @@ export interface Draft {
   content: string;
   tags: string[];
   isAnonymous: boolean;
+  postType?: "text" | "image" | "link" | "poll";
+  mediaUrl?: string;
+  pollOptions?: { text: string; votes: string[] }[];
 }
 
 export interface AnswerWithComments extends Answer {

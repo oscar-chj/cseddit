@@ -129,7 +129,7 @@ function recalculateAllUsersStats(): void {
 export function initializeDb(force = false): void {
   if (isServer) return;
 
-  if (force || !localStorage.getItem("cseddit_posts")) {
+  if (force || !localStorage.getItem("cseddit_posts") || !localStorage.getItem("cseddit_users")) {
     const seedUsers: User[] = [
       {
         id: "chloe_tan",
@@ -143,6 +143,9 @@ export function initializeDb(force = false): void {
         likes: 0,
         dislikes: 0,
         anonymousByDefault: false,
+        department: "Computer Science",
+        course: "B.Sc. Computer Science",
+        yearOfStudy: "2nd Year",
       },
       {
         id: "alex_mercer",
@@ -156,6 +159,9 @@ export function initializeDb(force = false): void {
         likes: 0,
         dislikes: 0,
         anonymousByDefault: false,
+        department: "Software Engineering",
+        course: "B.Sc. Software Engineering",
+        yearOfStudy: "4th Year",
       },
       {
         id: "sarah_connor",
@@ -169,6 +175,9 @@ export function initializeDb(force = false): void {
         likes: 0,
         dislikes: 0,
         anonymousByDefault: false,
+        department: "Networking",
+        course: "B.Sc. Computer Networks",
+        yearOfStudy: "3rd Year",
       },
       {
         id: "john_doe",
@@ -182,6 +191,9 @@ export function initializeDb(force = false): void {
         likes: 0,
         dislikes: 0,
         anonymousByDefault: false,
+        department: "Multimedia",
+        course: "B.Sc. Multimedia Technology",
+        yearOfStudy: "1st Year",
       },
     ];
 
@@ -200,6 +212,7 @@ export function initializeDb(force = false): void {
         upvotes: ["alex_mercer", "sarah_connor"],
         downvotes: [],
         isFeatured: true,
+        postType: "text",
       },
       {
         id: "post_2",
@@ -214,6 +227,7 @@ export function initializeDb(force = false): void {
         upvotes: ["chloe_tan", "sarah_connor", "john_doe"],
         downvotes: [],
         isFeatured: false,
+        postType: "text",
       },
       {
         id: "post_3",
@@ -228,6 +242,75 @@ export function initializeDb(force = false): void {
         upvotes: ["alex_mercer"],
         downvotes: ["john_doe"],
         isFeatured: false,
+        postType: "text",
+      },
+      {
+        id: "post_4",
+        title: "Anonymous Feedback on CS301 Exam",
+        content:
+          "The mid-term exam for CS301 was extremely long. Did anyone else struggle to finish it in time, or was it just me?",
+        tags: ["CS301", "Exam", "Feedback"],
+        authorId: "anonymous",
+        authorName: "Anonymous",
+        authorAvatar: "👤",
+        timestamp: now - 6 * 60 * 60 * 1000, // 6 hours ago
+        upvotes: ["chloe_tan"],
+        downvotes: [],
+        isFeatured: false,
+        postType: "text",
+      },
+      {
+        id: "post_5",
+        title: "Microservices Architecture Diagram",
+        content:
+          "Here is the proposed system design for our project. We are splitting the notification service from the core API.",
+        tags: ["Architecture", "SystemDesign", "Microservices"],
+        authorId: "alex_mercer",
+        authorName: "Alex Mercer",
+        authorAvatar: "🔥",
+        timestamp: now - 8 * 60 * 60 * 1000, // 8 hours ago
+        upvotes: ["sarah_connor", "john_doe"],
+        downvotes: [],
+        isFeatured: false,
+        postType: "image",
+        mediaUrl: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80",
+      },
+      {
+        id: "post_6",
+        title: "Essential Guide to Rust Memory Management",
+        content:
+          "This article covers ownership, borrowing, and lifetimes in Rust. It's a great read for beginners!",
+        tags: ["Rust", "Systems", "Programming"],
+        authorId: "sarah_connor",
+        authorName: "Sarah Connor",
+        authorAvatar: "🛡️",
+        timestamp: now - 18 * 60 * 60 * 1000, // 18 hours ago
+        upvotes: ["alex_mercer"],
+        downvotes: [],
+        isFeatured: false,
+        postType: "link",
+        mediaUrl: "https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html",
+      },
+      {
+        id: "post_7",
+        title: "What is your primary programming language?",
+        content:
+          "Let's see what languages are most popular in our department this year.",
+        tags: ["Programming", "Survey", "General"],
+        authorId: "john_doe",
+        authorName: "John Doe",
+        authorAvatar: "💻",
+        timestamp: now - 4 * 60 * 60 * 1000, // 4 hours ago
+        upvotes: ["chloe_tan", "alex_mercer"],
+        downvotes: [],
+        isFeatured: false,
+        postType: "poll",
+        pollOptions: [
+          { text: "TypeScript / JavaScript", votes: ["chloe_tan", "john_doe"] },
+          { text: "Python", votes: ["alex_mercer"] },
+          { text: "Rust / C++", votes: ["sarah_connor"] },
+          { text: "Java / C#", votes: [] },
+        ],
       },
     ];
 
@@ -377,7 +460,8 @@ export function createPost(
   posts.unshift(newPost);
   setRaw("cseddit_posts", posts);
   recalculateUserStats(postInput.authorId);
-  return newPost;
+  const users = getRaw<User[]>("cseddit_users", []);
+  return resolveAuthorInfo(newPost, users);
 }
 
 export function updatePost(post: Post): void {
@@ -440,7 +524,8 @@ export function createAnswer(
   answers.push(newAnswer);
   setRaw("cseddit_answers", answers);
   recalculateUserStats(answerInput.authorId);
-  return newAnswer;
+  const users = getRaw<User[]>("cseddit_users", []);
+  return resolveAuthorInfo(newAnswer, users);
 }
 
 export function createComment(
@@ -458,7 +543,8 @@ export function createComment(
   };
   comments.push(newComment);
   setRaw("cseddit_comments", comments);
-  return newComment;
+  const users = getRaw<User[]>("cseddit_users", []);
+  return resolveAuthorInfo(newComment, users);
 }
 
 export function votePost(
@@ -537,6 +623,34 @@ export function voteAnswer(
 
   setRaw("cseddit_answers", answers);
   recalculateUserStats(answer.authorId);
+}
+
+export function votePoll(
+  postId: string,
+  optionIndex: number,
+  userId: string
+): Post | null {
+  if (!userId || userId === "anonymous") return null;
+  initializeDb();
+  const posts = getRaw<Post[]>("cseddit_posts", []);
+  const postIndex = posts.findIndex((p) => p.id === postId);
+  if (postIndex === -1) return null;
+
+  const post = posts[postIndex];
+  if (post.postType !== "poll" || !post.pollOptions) return null;
+
+  const hasVoted = post.pollOptions.some((option) => option.votes.includes(userId));
+
+  if (!hasVoted) {
+    const option = post.pollOptions[optionIndex];
+    if (option) {
+      option.votes.push(userId);
+      setRaw("cseddit_posts", posts);
+    }
+  }
+
+  const users = getRaw<User[]>("cseddit_users", []);
+  return resolveAuthorInfo(post, users);
 }
 
 export function getUsers(): User[] {
