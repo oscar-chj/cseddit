@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   TextBIcon,
   TextItalicIcon,
@@ -92,29 +93,29 @@ export default function AskQuestionPage() {
 
   const handlePost = () => {
     if (!title.trim()) {
-      toast.error("Please enter a title");
+      toast.error("Enter a title");
       return;
     }
 
     if (activeTab === "text") {
       if (!content.trim()) {
-        toast.error("Please describe your question details");
+        toast.error("Describe your question details");
         return;
       }
     } else if (activeTab === "image") {
       if (!mediaUrl.trim()) {
-        toast.error("Please enter an image/video URL");
+        toast.error("Enter an image/video URL");
         return;
       }
     } else if (activeTab === "link") {
       if (!mediaUrl.trim()) {
-        toast.error("Please enter an external link URL");
+        toast.error("Enter an external link URL");
         return;
       }
     } else if (activeTab === "poll") {
       const validOptions = pollOptions.filter((opt) => opt.trim() !== "");
       if (validOptions.length < 2) {
-        toast.error("Please provide at least 2 non-empty poll options");
+        toast.error("Provide at least 2 non-empty poll options");
         return;
       }
     }
@@ -210,7 +211,7 @@ export default function AskQuestionPage() {
     <div className="mx-auto max-w-4xl px-4 py-6 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-border pb-4 gap-4">
         <div>
-          <h1 className="text-xl font-bold text-foreground">Create a Post</h1>
+          <h1 className="text-xl font-bold text-foreground">Create a post</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
             Share your thoughts, ask questions, post updates, or start surveys with the community.
           </p>
@@ -222,21 +223,23 @@ export default function AskQuestionPage() {
         <div className="lg:col-span-3 space-y-6">
           {/* Anonymity Selector */}
           <div className="space-y-2">
-            <Label className="text-sm font-bold text-foreground">Posting As</Label>
+            <Label className="text-sm font-bold text-foreground">Posting as</Label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Card A: Publish as User */}
               <button
                 type="button"
                 onClick={() => setIsAnonymous(false)}
-                className={`flex items-start gap-3 p-3 rounded-lg border text-left transition-all cursor-pointer ${
+                className={`flex items-start gap-3 p-3 rounded-none border text-left transition-all cursor-pointer ${
                   !isAnonymous
                     ? "border-blue-600 bg-blue-50/5 dark:bg-blue-950/20 ring-1 ring-blue-600"
                     : "border-border bg-card hover:bg-muted/40"
                 }`}
               >
-                <div className="flex items-center justify-center h-10 w-10 rounded-full bg-muted text-xl shrink-0">
-                  {currentUser?.avatar || "👾"}
-                </div>
+                <Avatar className="h-10 w-10 shrink-0 flex items-center justify-center rounded-none">
+                  <AvatarFallback className="text-xl bg-muted rounded-none">
+                    {currentUser?.avatar || "👾"}
+                  </AvatarFallback>
+                </Avatar>
                 <div className="space-y-0.5">
                   <p className="text-sm font-bold text-foreground">
                     Publish as {currentUser?.name || "Chloe Tan"}
@@ -251,17 +254,19 @@ export default function AskQuestionPage() {
               <button
                 type="button"
                 onClick={() => setIsAnonymous(true)}
-                className={`flex items-start gap-3 p-3 rounded-lg border text-left transition-all cursor-pointer ${
+                className={`flex items-start gap-3 p-3 rounded-none border text-left transition-all cursor-pointer ${
                   isAnonymous
                     ? "border-blue-600 bg-blue-50/5 dark:bg-blue-950/20 ring-1 ring-blue-600"
                     : "border-border bg-card hover:bg-muted/40"
                 }`}
               >
-                <div className="flex items-center justify-center h-10 w-10 rounded-full bg-muted text-xl shrink-0">
-                  👤
-                </div>
+                <Avatar className="h-10 w-10 shrink-0 flex items-center justify-center rounded-none">
+                  <AvatarFallback className="text-xl bg-muted rounded-none">
+                    👤
+                  </AvatarFallback>
+                </Avatar>
                 <div className="space-y-0.5">
-                  <p className="text-sm font-bold text-foreground">Publish Anonymously</p>
+                  <p className="text-sm font-bold text-foreground">Publish anonymously</p>
                   <p className="text-xs text-muted-foreground leading-snug">
                     Your post will be anonymous. Your profile details remain hidden.
                   </p>
@@ -272,17 +277,17 @@ export default function AskQuestionPage() {
 
           {/* Post tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-4 w-full max-w-md h-9">
-              <TabsTrigger value="text" className="text-xs data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+            <TabsList className="grid w-full grid-cols-4 bg-muted p-1 rounded-none border border-border h-10">
+              <TabsTrigger value="text" className="text-xs rounded-none border-0 data-[state=active]:bg-background">
                 Text
               </TabsTrigger>
-              <TabsTrigger value="image" className="text-xs data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-                Images & Videos
+              <TabsTrigger value="image" className="text-xs rounded-none border-0 data-[state=active]:bg-background">
+                Image/video
               </TabsTrigger>
-              <TabsTrigger value="link" className="text-xs data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <TabsTrigger value="link" className="text-xs rounded-none border-0 data-[state=active]:bg-background">
                 Link
               </TabsTrigger>
-              <TabsTrigger value="poll" className="text-xs data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+              <TabsTrigger value="poll" className="text-xs rounded-none border-0 data-[state=active]:bg-background">
                 Poll
               </TabsTrigger>
             </TabsList>
@@ -307,15 +312,15 @@ export default function AskQuestionPage() {
                 }
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="focus-visible:ring-blue-500 border-border h-10 text-sm"
+                className="focus-visible:ring-blue-500 border-border h-10 text-sm rounded-none"
               />
             </div>
 
             {/* Dynamic rendering of other inputs */}
             {activeTab === "text" && (
               <div className="space-y-2">
-                <Label className="text-sm font-bold text-foreground">Question Body</Label>
-                <div className="border border-border rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
+                <Label className="text-sm font-bold text-foreground">Question body</Label>
+                <div className="border border-border rounded-none overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
                   {/* Editor Toolbar */}
                   <div className="flex items-center gap-1 bg-muted/40 p-2 border-b border-border flex-wrap">
                     <Button
@@ -351,7 +356,7 @@ export default function AskQuestionPage() {
                       variant="ghost"
                       className="h-8 w-8 text-muted-foreground hover:text-blue-600"
                       onClick={() => insertMarkdown("- ", "")}
-                      title="Bullet List"
+                      title="Bullet list"
                     >
                       <ListBulletsIcon className="h-4 w-4" />
                     </Button>
@@ -360,7 +365,7 @@ export default function AskQuestionPage() {
                       variant="ghost"
                       className="h-8 w-8 text-muted-foreground hover:text-blue-600"
                       onClick={() => insertMarkdown("1. ", "")}
-                      title="Numbered List"
+                      title="Numbered list"
                     >
                       <ListNumbersIcon className="h-4 w-4" />
                     </Button>
@@ -369,7 +374,7 @@ export default function AskQuestionPage() {
                       variant="ghost"
                       className="h-8 w-8 text-muted-foreground hover:text-blue-600"
                       onClick={() => insertMarkdown("`", "`")}
-                      title="Inline Code"
+                      title="Inline code"
                     >
                       <CodeIcon className="h-4 w-4" />
                     </Button>
@@ -381,7 +386,7 @@ export default function AskQuestionPage() {
                     placeholder="Introduce the problem and expand on what you've tried..."
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
-                    className="border-0 focus-visible:ring-0 rounded-t-none min-h-[220px] p-4 text-sm resize-y"
+                    className="border-0 focus-visible:ring-0 rounded-none min-h-[220px] p-4 text-sm resize-y"
                   />
                 </div>
               </div>
@@ -391,26 +396,26 @@ export default function AskQuestionPage() {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="image-url" className="text-sm font-bold text-foreground">
-                    Image/Video URL
+                    Image/video URL
                   </Label>
                   <Input
                     id="image-url"
                     placeholder="https://example.com/image.jpg"
                     value={mediaUrl}
                     onChange={(e) => setMediaUrl(e.target.value)}
-                    className="focus-visible:ring-blue-500 border-border h-10 text-sm"
+                    className="focus-visible:ring-blue-500 border-border h-10 text-sm rounded-none"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="image-description" className="text-sm font-bold text-foreground">
-                    Description / Caption
+                    Description / caption
                   </Label>
                   <Textarea
                     id="image-description"
                     placeholder="Add a description or caption for your image/video..."
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
-                    className="focus-visible:ring-blue-500 border-border min-h-[120px] p-4 text-sm resize-y"
+                    className="focus-visible:ring-blue-500 border-border min-h-[120px] p-4 text-sm resize-y rounded-none"
                   />
                 </div>
               </div>
@@ -420,26 +425,26 @@ export default function AskQuestionPage() {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="link-url" className="text-sm font-bold text-foreground">
-                    External Link URL
+                    External link URL
                   </Label>
                   <Input
                     id="link-url"
                     placeholder="https://github.com"
                     value={mediaUrl}
                     onChange={(e) => setMediaUrl(e.target.value)}
-                    className="focus-visible:ring-blue-500 border-border h-10 text-sm"
+                    className="focus-visible:ring-blue-500 border-border h-10 text-sm rounded-none"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="link-description" className="text-sm font-bold text-foreground">
-                    Description / Commentary
+                    Description / commentary
                   </Label>
                   <Textarea
                     id="link-description"
                     placeholder="Add some description or commentary about this link..."
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
-                    className="focus-visible:ring-blue-500 border-border min-h-[120px] p-4 text-sm resize-y"
+                    className="focus-visible:ring-blue-500 border-border min-h-[120px] p-4 text-sm resize-y rounded-none"
                   />
                 </div>
               </div>
@@ -448,11 +453,11 @@ export default function AskQuestionPage() {
             {activeTab === "poll" && (
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label className="text-sm font-bold text-foreground">Poll Options Editor</Label>
-                  <div className="space-y-2 bg-muted/10 p-3 rounded-lg border border-border">
+                  <Label className="text-sm font-bold text-foreground">Poll options editor</Label>
+                  <div className="space-y-2 bg-muted/10 p-3 rounded-none border border-border">
                     {pollOptions.map((option, idx) => (
                       <div key={idx} className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground w-16 shrink-0">Option {idx + 1}</span>
+                        <span className="text-xs text-muted-foreground w-16 shrink-0 font-medium">Option {idx + 1}</span>
                         <Input
                           placeholder={`Option ${idx + 1} text`}
                           value={option}
@@ -461,7 +466,7 @@ export default function AskQuestionPage() {
                             newOptions[idx] = e.target.value;
                             setPollOptions(newOptions);
                           }}
-                          className="focus-visible:ring-blue-500 border-border h-10 text-sm flex-1"
+                          className="focus-visible:ring-blue-500 border-border h-10 text-sm flex-1 rounded-none"
                         />
                         {pollOptions.length > 2 && (
                           <Button
@@ -472,10 +477,10 @@ export default function AskQuestionPage() {
                               const newOptions = pollOptions.filter((_, i) => i !== idx);
                               setPollOptions(newOptions);
                             }}
-                            className="border-border text-muted-foreground hover:text-destructive hover:border-destructive text-xs h-9 px-3 shrink-0"
+                            className="border-border text-muted-foreground hover:text-destructive hover:border-destructive text-xs h-9 px-3 shrink-0 rounded-none"
                           >
                             <TrashIcon className="h-3.5 w-3.5 mr-1" />
-                            Remove Option
+                            Remove option
                           </Button>
                         )}
                       </div>
@@ -491,9 +496,9 @@ export default function AskQuestionPage() {
                               setPollOptions([...pollOptions, ""]);
                             }
                           }}
-                          className="border-border hover:bg-blue-50 hover:text-blue-600 transition-colors text-xs"
+                          className="border-border hover:bg-blue-50 hover:text-blue-600 transition-colors text-xs rounded-none"
                         >
-                          Add Option
+                          Add option
                         </Button>
                       )}
                     </div>
@@ -501,14 +506,14 @@ export default function AskQuestionPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="poll-description" className="text-sm font-bold text-foreground">
-                    Description / Context
+                    Description / context
                   </Label>
                   <Textarea
                     id="poll-description"
                     placeholder="Add some context or details for this poll..."
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
-                    className="focus-visible:ring-blue-500 border-border min-h-[120px] p-4 text-sm resize-y"
+                    className="focus-visible:ring-blue-500 border-border min-h-[120px] p-4 text-sm resize-y rounded-none"
                   />
                 </div>
               </div>
@@ -516,8 +521,8 @@ export default function AskQuestionPage() {
 
             {/* Tags Selection */}
             <div className="space-y-2">
-              <Label className="text-sm font-bold text-foreground">Tags (Max 5)</Label>
-              <div className="flex flex-wrap gap-2 p-3 border border-border rounded-lg bg-muted/20">
+              <Label className="text-sm font-bold text-foreground">Tags (max 5)</Label>
+              <div className="flex flex-wrap gap-2 p-3 border border-border rounded-none bg-muted/20">
                 {AVAILABLE_TAGS.map((tag) => {
                   const isSelected = selectedTags.includes(tag);
                   return (
@@ -525,7 +530,7 @@ export default function AskQuestionPage() {
                       key={tag}
                       variant={isSelected ? "default" : "outline"}
                       onClick={() => handleTagToggle(tag)}
-                      className={`cursor-pointer transition-colors text-xs py-1 px-2.5 font-normal ${
+                      className={`cursor-pointer transition-colors text-xs py-1 px-2.5 font-normal rounded-none ${
                         isSelected
                           ? "bg-blue-600 text-white hover:bg-blue-700"
                           : "border-border hover:bg-blue-50 hover:text-blue-600 text-muted-foreground"
@@ -542,7 +547,7 @@ export default function AskQuestionPage() {
             <div className="flex items-center gap-3 pt-2">
               <Button
                 onClick={handlePost}
-                className="bg-blue-600 hover:bg-blue-700 text-white gap-1.5 h-10 px-5"
+                className="bg-blue-600 hover:bg-blue-700 text-white gap-1.5 h-10 px-5 rounded-none"
               >
                 <PaperPlaneTiltIcon className="h-4 w-4" weight="bold" />
                 Post
@@ -550,7 +555,7 @@ export default function AskQuestionPage() {
               <Button
                 variant="outline"
                 onClick={handleSaveDraft}
-                className="border-border hover:bg-blue-50 hover:text-blue-600 transition-colors gap-1.5 h-10"
+                className="border-border hover:bg-blue-50 hover:text-blue-600 transition-colors gap-1.5 h-10 rounded-none"
               >
                 <FloppyDiskIcon className="h-4 w-4" />
                 Save draft
@@ -562,11 +567,11 @@ export default function AskQuestionPage() {
         {/* Sidebar drafts */}
         <div className="lg:col-span-1 space-y-4">
           <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-            Your Saved Drafts
+            Your saved drafts
           </h2>
           <div className="space-y-3">
             {drafts.length === 0 ? (
-              <p className="text-xs text-muted-foreground bg-muted/20 p-3 rounded-lg border border-dashed border-border">
+              <p className="text-xs text-muted-foreground bg-muted/20 p-3 rounded-none border border-dashed border-border">
                 No active drafts.
               </p>
             ) : (
@@ -574,13 +579,13 @@ export default function AskQuestionPage() {
                 <div
                   key={draft.id}
                   onClick={() => handleLoadDraft(draft)}
-                  className={`p-3 border rounded-lg text-left cursor-pointer transition-all hover:bg-muted/40 ${
+                  className={`p-3 border rounded-none text-left cursor-pointer transition-all hover:bg-muted/40 ${
                     activeDraftId === draft.id ? "border-blue-500 bg-blue-50/10" : "border-border bg-card"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-1.5">
                     <span className="text-xs font-bold text-foreground line-clamp-1">
-                      {draft.title || "(Untitled Draft)"}
+                      {draft.title || "(Untitled draft)"}
                     </span>
                     <button
                       onClick={(e) => handleDeleteDraft(e, draft.id)}
