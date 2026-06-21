@@ -1,116 +1,127 @@
-"use client";
+"use client"
 
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { getUserById, getCurrentUserId, updateUserProfile, getPosts, getDrafts } from "@/lib/mockDb";
-import { User, Post, Draft } from "@/types";
-import { toast } from "sonner";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Card, CardContent } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { StarIcon, ThumbsUpIcon, BookOpenIcon, FileTextIcon } from "@phosphor-icons/react";
-import { formatTimeAgo } from "@/lib/postUtils";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
+import {
+  getUserById,
+  getCurrentUserId,
+  updateUserProfile,
+  getPosts,
+  getAnswersByUser,
+} from "@/lib/mockDb"
+import { formatTimeAgo } from "@/lib/postUtils"
+import { User, Post, Answer } from "@/types"
+import {
+  StarIcon,
+  ThumbsUpIcon,
+  BookOpenIcon,
+  ChatTeardropTextIcon,
+} from "@phosphor-icons/react"
+import Link from "next/link"
+import { useParams } from "next/navigation"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
 
 export default function UserProfilePage() {
-  const params = useParams();
-  const router = useRouter();
-  const profileId = params.id as string;
+  const params = useParams()
+  const profileId = params.id as string
 
-  const [user, setUser] = useState<User | null>(null);
-  const [userPosts, setUserPosts] = useState<Post[]>([]);
-  const [drafts, setDrafts] = useState<Draft[]>([]);
-  const [mounted, setMounted] = useState(false);
-  const [currentUserId, setCurrentUserId] = useState("");
+  const [user, setUser] = useState<User | null>(null)
+  const [userPosts, setUserPosts] = useState<Post[]>([])
+  const [userAnswers, setUserAnswers] = useState<(Answer & { postTitle: string })[]>([])
+  const [mounted, setMounted] = useState(false)
+  const [currentUserId, setCurrentUserId] = useState("")
 
   const loadData = () => {
-    const targetUser = getUserById(profileId);
-    const loggedInId = getCurrentUserId();
-    setCurrentUserId(loggedInId);
+    const targetUser = getUserById(profileId)
+    const loggedInId = getCurrentUserId()
+    setCurrentUserId(loggedInId)
 
     if (targetUser) {
-      setUser(targetUser);
-      const allPosts = getPosts();
-      const filtered = allPosts.filter((p) => p.authorId === targetUser.id);
-      setUserPosts(filtered);
-
-      if (targetUser.id === loggedInId) {
-        setDrafts(getDrafts());
-      }
+      setUser(targetUser)
+      const allPosts = getPosts()
+      const filtered = allPosts.filter((p) => p.authorId === targetUser.id)
+      setUserPosts(filtered)
+      setUserAnswers(getAnswersByUser(targetUser.id))
     }
-  };
+  }
 
   useEffect(() => {
     setTimeout(() => {
-      setMounted(true);
-      loadData();
-    }, 0);
-  }, [profileId]);
+      setMounted(true)
+      loadData()
+    }, 0)
+  }, [profileId])
 
   const handleToggleAnonymity = (checked: boolean) => {
-    if (!user) return;
-    const updated = updateUserProfile(user.id, { anonymousByDefault: checked });
+    if (!user) return
+    const updated = updateUserProfile(user.id, { anonymousByDefault: checked })
     if (updated) {
-      setUser(updated);
-      toast(checked ? "Anonymous by default enabled" : "Anonymous by default disabled");
+      setUser(updated)
+      toast(
+        checked
+          ? "Anonymous by default enabled"
+          : "Anonymous by default disabled"
+      )
     }
-  };
+  }
 
   if (!mounted) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-6 space-y-6 animate-pulse">
-        <div className="h-48 bg-muted rounded-none" />
-        <div className="h-32 bg-muted rounded-none" />
+      <div className="mx-auto max-w-4xl animate-pulse space-y-6 px-4 py-6">
+        <div className="h-48 rounded-none bg-muted" />
+        <div className="h-32 rounded-none bg-muted" />
       </div>
-    );
+    )
   }
 
   if (!user) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-12 text-center space-y-4">
+      <div className="mx-auto max-w-4xl space-y-4 px-4 py-12 text-center">
         <h1 className="text-2xl font-bold text-foreground">User not found</h1>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           The contributor profile you are trying to view does not exist.
         </p>
         <div className="pt-2">
           <Link href="/">
-            <button className="px-4 py-2 bg-blue-600 text-white text-sm hover:bg-blue-700 transition-colors rounded-none">
+            <button className="rounded-none bg-blue-600 px-4 py-2 text-sm text-white transition-colors hover:bg-blue-700">
               Back to Dashboard
             </button>
           </Link>
         </div>
       </div>
-    );
+    )
   }
 
-  const isOwnProfile = user.id === currentUserId;
+  const isOwnProfile = user.id === currentUserId
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-6 space-y-8">
+    <div className="mx-auto max-w-4xl space-y-8 px-4 py-6">
       {/* Profile Header Card */}
-      <Card className="border-border rounded-none overflow-hidden bg-card">
+      <Card className="overflow-hidden rounded-none border-border bg-card">
         <CardContent className="p-6 sm:p-8">
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8">
+          <div className="flex flex-col items-center gap-6 md:flex-row md:items-start md:gap-8">
             {/* Left Column: Avatar & Badges */}
-            <div className="flex flex-col items-center gap-4 min-w-[150px]">
-              <Avatar className="h-24 w-24 border border-border shadow-sm flex items-center justify-center">
-                <AvatarFallback className="bg-blue-100 text-blue-800 text-4xl font-semibold">
+            <div className="flex min-w-[150px] flex-col items-center gap-4">
+              <Avatar className="flex h-24 w-24 items-center justify-center border border-border shadow-sm">
+                <AvatarFallback className="bg-blue-100 text-4xl font-semibold text-blue-800">
                   {user.avatar}
                 </AvatarFallback>
               </Avatar>
 
               {/* Badges Shelf */}
               <div className="space-y-1.5 text-center">
-                <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block">
+                <span className="block text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
                   Earned Badges
                 </span>
-                <div className="flex items-center gap-1.5 justify-center bg-muted/40 px-3 py-1.5 rounded-none border border-border">
+                <div className="flex items-center justify-center gap-1.5 rounded-none border border-border bg-muted/40 px-3 py-1.5">
                   {user.badges.map((badge, idx) => (
                     <span
                       key={idx}
-                      className="text-lg hover:scale-125 transition-transform cursor-help"
+                      className="cursor-help text-lg transition-transform hover:scale-125"
                       title={`Earned badge ${badge}`}
                     >
                       {badge}
@@ -121,67 +132,81 @@ export default function UserProfilePage() {
             </div>
 
             {/* Right Column: Name, Title, Bio, Settings */}
-            <div className="flex-1 space-y-4 text-center md:text-left w-full">
+            <div className="w-full flex-1 space-y-4 text-center md:text-left">
               <div className="space-y-1.5">
-                <div className="flex flex-col md:flex-row md:items-center gap-2 justify-center md:justify-start">
-                  <h1 className="text-xl sm:text-2xl font-bold text-foreground leading-tight">{user.name}</h1>
-                  <span className="text-xs text-muted-foreground self-center">@{user.username}</span>
+                <div className="flex flex-col justify-center gap-2 md:flex-row md:items-center md:justify-start">
+                  <h1 className="text-xl leading-tight font-bold text-foreground sm:text-2xl">
+                    {user.name}
+                  </h1>
+                  <span className="self-center text-xs text-muted-foreground">
+                    @{user.username}
+                  </span>
                 </div>
-                
+
                 {/* Department & Year of Study Tags */}
-                <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5">
-                  <Badge variant="secondary" className="text-[10px] font-normal px-2 rounded-none">
+                <div className="flex flex-wrap items-center justify-center gap-1.5 md:justify-start">
+                  <Badge
+                    variant="secondary"
+                    className="rounded-none px-2 text-[10px] font-normal"
+                  >
                     Dept: {user.department}
                   </Badge>
-                  <Badge variant="outline" className="border-border text-[10px] font-normal px-2 rounded-none">
+                  <Badge
+                    variant="outline"
+                    className="rounded-none border-border px-2 text-[10px] font-normal"
+                  >
                     Year: {user.yearOfStudy}
                   </Badge>
                 </div>
-
-                <p className="text-xs text-blue-600 font-semibold uppercase tracking-wider pt-0.5">
-                  {user.title}
-                </p>
               </div>
 
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-sm leading-relaxed text-muted-foreground">
                 {user.bio || "No biography provided."}
               </p>
 
               {/* Stats Counters */}
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 sm:gap-6 pt-2">
-                <div className="flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 px-3.5 py-2 rounded-none">
+              <div className="flex flex-wrap items-center justify-center gap-4 pt-2 sm:gap-6 md:justify-start">
+                <div className="flex items-center gap-2 rounded-none border border-blue-500/20 bg-blue-500/10 px-3.5 py-2">
                   <StarIcon className="h-5 w-5 text-blue-500" weight="fill" />
                   <div className="text-left">
-                    <span className="block text-sm font-bold text-foreground leading-none">
+                    <span className="block text-sm leading-none font-bold text-foreground">
                       {user.reputation}
                     </span>
-                    <span className="text-[10px] text-muted-foreground font-medium">Reputation</span>
+                    <span className="text-[10px] font-medium text-muted-foreground">
+                      Reputation
+                    </span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-3.5 py-2 rounded-none">
-                  <ThumbsUpIcon className="h-5 w-5 text-emerald-500" weight="fill" />
+                <div className="flex items-center gap-2 rounded-none border border-emerald-500/20 bg-emerald-500/10 px-3.5 py-2">
+                  <ThumbsUpIcon
+                    className="h-5 w-5 text-emerald-500"
+                    weight="fill"
+                  />
                   <div className="text-left">
-                    <span className="block text-sm font-bold text-foreground leading-none">
+                    <span className="block text-sm leading-none font-bold text-foreground">
                       {user.likes}
                     </span>
-                    <span className="text-[10px] text-muted-foreground font-medium">Likes</span>
+                    <span className="text-[10px] font-medium text-muted-foreground">
+                      Likes
+                    </span>
                   </div>
                 </div>
-
-
               </div>
 
               {/* Default Anonymity Setting Toggle */}
               {isOwnProfile && (
-                <div className="flex items-center justify-center md:justify-start gap-3 pt-4 border-t border-border">
+                <div className="flex items-center justify-center gap-3 border-t border-border pt-4 md:justify-start">
                   <Switch
                     id="default-anonymity"
                     checked={user.anonymousByDefault}
                     onCheckedChange={handleToggleAnonymity}
                     className="data-[state=checked]:bg-blue-600"
                   />
-                  <Label htmlFor="default-anonymity" className="text-xs font-semibold cursor-pointer">
+                  <Label
+                    htmlFor="default-anonymity"
+                    className="cursor-pointer text-xs font-semibold"
+                  >
                     Publish questions anonymously by default
                   </Label>
                 </div>
@@ -193,32 +218,35 @@ export default function UserProfilePage() {
 
       {/* User's Created Posts Feed */}
       <div className="space-y-4">
-        <h2 className="text-base font-bold text-foreground flex items-center gap-2 border-b border-border pb-2">
+        <h2 className="flex items-center gap-2 border-b border-border pb-2 text-base font-bold text-foreground">
           <BookOpenIcon className="h-5 w-5 text-blue-600" />
-          {isOwnProfile ? "My Questions" : `${user.name}'s Questions`} ({userPosts.length})
+          {isOwnProfile ? "My Questions" : `${user.name}'s Questions`} (
+          {userPosts.length})
         </h2>
 
         {userPosts.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground text-sm border border-dashed rounded-none">
-            {isOwnProfile ? "You haven't asked any questions yet." : "No questions asked by this contributor yet."}
+          <div className="rounded-none border border-dashed p-8 text-center text-sm text-muted-foreground">
+            {isOwnProfile
+              ? "You haven't asked any questions yet."
+              : "No questions asked by this contributor yet."}
           </div>
         ) : (
-          <div className="divide-y divide-border border rounded-none overflow-hidden bg-card">
+          <div className="divide-y divide-border overflow-hidden rounded-none border bg-card">
             {userPosts.map((post) => {
-              const postScore = post.upvotes.length - post.downvotes.length;
+              const postScore = post.upvotes.length - post.downvotes.length
               return (
                 <div
                   key={post.id}
-                  className="p-4 sm:p-5 hover:bg-muted/30 transition-colors flex items-start justify-between gap-4"
+                  className="flex items-start justify-between gap-4 p-4 transition-colors hover:bg-muted/30 sm:p-5"
                 >
-                  <div className="space-y-1.5 flex-1">
+                  <div className="flex-1 space-y-1.5">
                     <Link
                       href={`/posts/${post.id}`}
-                      className="text-sm sm:text-base font-bold text-foreground hover:text-blue-600 transition-colors block"
+                      className="block text-sm font-bold text-foreground transition-colors hover:text-blue-600 sm:text-base"
                     >
                       {post.title}
                     </Link>
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
+                    <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                       <span>Asked {formatTimeAgo(post.timestamp)}</span>
                       <span>•</span>
                       <div className="flex items-center gap-1">
@@ -226,7 +254,7 @@ export default function UserProfilePage() {
                           <Badge
                             key={tag}
                             variant="outline"
-                            className="text-[10px] font-normal text-muted-foreground py-0 border-border hover:bg-blue-50 hover:text-blue-600 transition-colors rounded-none"
+                            className="rounded-none border-border py-0 text-[10px] font-normal text-muted-foreground transition-colors hover:bg-blue-50 hover:text-blue-600"
                           >
                             {tag}
                           </Badge>
@@ -235,65 +263,73 @@ export default function UserProfilePage() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col items-center justify-center px-3 py-1.5 bg-muted/40 rounded-none border border-border min-w-[60px] text-center">
-                    <span className="text-xs font-bold text-foreground">{postScore}</span>
-                    <span className="text-[9px] text-muted-foreground uppercase font-medium mt-0.5">
+                  <div className="flex min-w-[60px] flex-col items-center justify-center rounded-none border border-border bg-muted/40 px-3 py-1.5 text-center">
+                    <span className="text-xs font-bold text-foreground">
+                      {postScore}
+                    </span>
+                    <span className="mt-0.5 text-[9px] font-medium text-muted-foreground uppercase">
                       votes
                     </span>
                   </div>
                 </div>
-              );
+              )
             })}
           </div>
         )}
       </div>
 
-      {/* User's Drafts (if own profile) */}
-      {isOwnProfile && (
-        <div className="space-y-4 pt-4">
-          <h2 className="text-base font-bold text-foreground flex items-center gap-2 border-b border-border pb-2">
-            <FileTextIcon className="h-5 w-5 text-blue-600" />
-            My Drafts ({drafts.length})
-          </h2>
+      {/* User's Answers */}
+      <div className="space-y-4 pt-4">
+        <h2 className="flex items-center gap-2 border-b border-border pb-2 text-base font-bold text-foreground">
+          <ChatTeardropTextIcon className="h-5 w-5 text-blue-600" />
+          {isOwnProfile ? "My Answers" : `${user.name}'s Answers`} (
+          {userAnswers.length})
+        </h2>
 
-          {drafts.length === 0 ? (
-            <div className="p-8 text-center text-muted-foreground text-sm border border-dashed rounded-none">
-              No saved drafts found.
-            </div>
-          ) : (
-            <div className="divide-y divide-border border rounded-none overflow-hidden bg-card">
-              {drafts.map((draft) => (
+        {userAnswers.length === 0 ? (
+          <div className="rounded-none border border-dashed p-8 text-center text-sm text-muted-foreground">
+            {isOwnProfile
+              ? "You haven't answered any questions yet."
+              : "No answers posted by this contributor yet."}
+          </div>
+        ) : (
+          <div className="divide-y divide-border overflow-hidden rounded-none border bg-card">
+            {userAnswers.map((answer) => {
+              const answerScore = answer.upvotes.length - answer.downvotes.length
+              return (
                 <div
-                  key={draft.id}
-                  className="p-4 sm:p-5 hover:bg-muted/30 transition-colors flex items-start justify-between gap-4"
+                  key={answer.id}
+                  className="flex items-start justify-between gap-4 p-4 transition-colors hover:bg-muted/30 sm:p-5"
                 >
-                  <div className="space-y-1 flex-1">
+                  <div className="flex-1 min-w-0 space-y-1.5">
                     <Link
-                      href="/create"
-                      className="text-sm sm:text-base font-bold text-foreground hover:text-blue-600 transition-colors block"
+                      href={`/posts/${answer.postId}`}
+                      className="block truncate text-sm font-semibold text-foreground transition-colors hover:text-blue-600 sm:text-base"
                     >
-                      {draft.title || "(Untitled Draft)"}
+                      {answer.postTitle}
                     </Link>
-                    <p className="text-xs text-muted-foreground line-clamp-1">
-                      {draft.content || "(No content)"}
+                    <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+                      {answer.content}
                     </p>
-                    <div className="flex items-center gap-2 pt-1">
-                      <span className="text-[10px] text-muted-foreground uppercase font-medium">
-                        {draft.postType || "text"}
-                      </span>
-                    </div>
+                    <span className="text-[10px] text-muted-foreground">
+                      Answered {formatTimeAgo(answer.timestamp)}
+                    </span>
                   </div>
-                  <Link href="/create">
-                    <button className="px-3 py-1 border border-border hover:bg-blue-50 hover:text-blue-600 transition-colors text-xs rounded-none">
-                      Edit
-                    </button>
-                  </Link>
+
+                  <div className="flex shrink-0 min-w-[60px] flex-col items-center justify-center rounded-none border border-border bg-muted/40 px-3 py-1.5 text-center">
+                    <span className="text-xs font-bold text-foreground">
+                      {answerScore}
+                    </span>
+                    <span className="mt-0.5 text-[9px] font-medium uppercase text-muted-foreground">
+                      votes
+                    </span>
+                  </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+              )
+            })}
+          </div>
+        )}
+      </div>
     </div>
-  );
+  )
 }

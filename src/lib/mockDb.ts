@@ -681,6 +681,22 @@ export function getUserById(id: string): User | null {
   return users.find((u) => u.id === id) || null;
 }
 
+export function getAnswersByUser(userId: string): (Answer & { postTitle: string })[] {
+  initializeDb();
+  const answers = getRaw<Answer[]>("cseddit_answers", []);
+  const posts = getRaw<Post[]>("cseddit_posts", []);
+  const users = getRaw<User[]>("cseddit_users", []);
+
+  return answers
+    .filter((a) => a.authorId === userId)
+    .map((a) => {
+      const resolved = resolveAuthorInfo(a, users);
+      const post = posts.find((p) => p.id === a.postId);
+      return { ...resolved, postTitle: post?.title ?? "Unknown question" };
+    })
+    .sort((a, b) => b.timestamp - a.timestamp);
+}
+
 export function updateUserProfile(
   id: string,
   data: Partial<User>
