@@ -3,12 +3,20 @@
 import React, { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ArrowUpIcon, ChatIcon } from "@phosphor-icons/react";
-import { getPosts } from "@/lib/mockDb";
+import { ArrowUpIcon, ArrowDownIcon, ChatIcon, ImageIcon, LinkIcon, ChartBarIcon } from "@phosphor-icons/react";
+import { getPosts, votePost, getCurrentUserId } from "@/lib/mockDb";
 import { Post } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+
+function getPostTypeIcon(postType?: string) {
+  if (postType === "image") return <ImageIcon className="h-4 w-4 text-muted-foreground shrink-0" />;
+  if (postType === "link") return <LinkIcon className="h-4 w-4 text-muted-foreground shrink-0" />;
+  if (postType === "poll") return <ChartBarIcon className="h-4 w-4 text-muted-foreground shrink-0" />;
+  return null;
+}
 
 function formatTimeAgo(timestamp: number) {
   const diff = Date.now() - timestamp;
@@ -26,14 +34,31 @@ function SearchResultsContent() {
   const query = searchParams.get("q") || "";
   const [posts, setPosts] = useState<Post[]>([]);
   const [mounted, setMounted] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState("");
 
   useEffect(() => {
     const allPosts = getPosts();
     setTimeout(() => {
       setMounted(true);
       setPosts(allPosts);
+      setCurrentUserId(getCurrentUserId());
     }, 0);
   }, []);
+
+  const handleVote = (postId: string, type: "up" | "down", authorId: string) => {
+    if (currentUserId === "anonymous") {
+      toast.error("Anonymous users cannot vote");
+      return;
+    }
+    if (authorId === currentUserId) {
+      toast.error("You cannot vote on your own question");
+      return;
+    }
+    votePost(postId, currentUserId, type);
+    const allPosts = getPosts();
+    setPosts(allPosts);
+    toast("Vote recorded");
+  };
 
   if (!mounted) {
     return (
@@ -68,7 +93,7 @@ function SearchResultsContent() {
         </p>
       </div>
 
-      <div className="divide-y divide-border border rounded-lg overflow-hidden bg-card">
+      <div className="divide-y divide-border border rounded-none overflow-hidden bg-card">
         {filteredPosts.length === 0 ? (
           <div className="p-12 text-center space-y-2">
             <p className="text-muted-foreground text-sm font-medium">
@@ -79,7 +104,7 @@ function SearchResultsContent() {
             </p>
             <div className="pt-2">
               <Link href="/">
-                <Button size="sm" variant="outline" className="border-border hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                <Button size="sm" variant="outline" className="rounded-none border-border hover:bg-blue-50 hover:text-blue-600 transition-colors">
                   Go back to Dashboard
                 </Button>
               </Link>
@@ -94,9 +119,38 @@ function SearchResultsContent() {
                 className="p-5 hover:bg-muted/30 transition-colors flex flex-col md:flex-row md:items-start gap-4"
               >
                 {/* Scores Sidebar (Desktop) */}
-                <div className="hidden md:flex flex-col items-center justify-center gap-1 text-center min-w-[70px] py-1 bg-muted/40 rounded-md border border-border">
-                  <span className="text-sm font-bold text-foreground">{score}</span>
-                  <span className="text-[10px] text-muted-foreground uppercase font-medium">votes</span>
+                <div className="hidden md:flex flex-col items-center justify-center gap-1.5 text-center min-w-[50px] py-2 bg-muted/20 border border-border rounded-none">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => handleVote(post.id, "up", post.authorId)}
+                    className={`h-7 w-7 rounded-none ${
+                      post.upvotes.includes(currentUserId)
+                        ? "text-blue-600 bg-blue-50/50"
+                        : "text-muted-foreground hover:text-blue-600"
+                    }`}
+                  >
+                    <ArrowUpIcon
+                      className="h-4 w-4"
+                      weight={post.upvotes.includes(currentUserId) ? "bold" : "regular"}
+                    />
+                  </Button>
+                  <span className="text-xs font-bold text-foreground">{score}</span>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => handleVote(post.id, "down", post.authorId)}
+                    className={`h-7 w-7 rounded-none ${
+                      post.downvotes.includes(currentUserId)
+                        ? "text-red-600 bg-red-50/50"
+                        : "text-muted-foreground hover:text-red-600"
+                    }`}
+                  >
+                    <ArrowDownIcon
+                      className="h-4 w-4"
+                      weight={post.downvotes.includes(currentUserId) ? "bold" : "regular"}
+                    />
+                  </Button>
                 </div>
 
                 {/* Main content body */}
@@ -121,7 +175,8 @@ function SearchResultsContent() {
                   </div>
 
                   <Link href={`/posts/${post.id}`} className="block group">
-                    <h3 className="text-base font-bold text-foreground group-hover:text-blue-600 transition-colors">
+                    <h3 className="text-base font-bold text-foreground group-hover:text-blue-600 transition-colors flex items-center gap-1.5">
+                      {getPostTypeIcon(post.postType)}
                       {post.title}
                     </h3>
                     <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
@@ -145,10 +200,39 @@ function SearchResultsContent() {
 
                     {/* Vote summary for mobile */}
                     <div className="flex items-center gap-3 text-xs text-muted-foreground md:hidden">
-                      <span className="flex items-center gap-1">
-                        <ArrowUpIcon className="h-3.5 w-3.5" />
-                        {score}
-                      </span>
+                      <div className="flex items-center border border-border bg-muted/20 rounded-none h-7 overflow-hidden">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => handleVote(post.id, "up", post.authorId)}
+                          className={`h-7 w-7 rounded-none ${
+                            post.upvotes.includes(currentUserId)
+                              ? "text-blue-600 bg-blue-50/50"
+                              : "text-muted-foreground"
+                          }`}
+                        >
+                          <ArrowUpIcon
+                            className="h-3.5 w-3.5"
+                            weight={post.upvotes.includes(currentUserId) ? "bold" : "regular"}
+                          />
+                        </Button>
+                        <span className="px-2 font-bold text-foreground text-xs">{score}</span>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => handleVote(post.id, "down", post.authorId)}
+                          className={`h-7 w-7 rounded-none ${
+                            post.downvotes.includes(currentUserId)
+                              ? "text-red-600 bg-red-50/50"
+                              : "text-muted-foreground"
+                          }`}
+                        >
+                          <ArrowDownIcon
+                            className="h-3.5 w-3.5"
+                            weight={post.downvotes.includes(currentUserId) ? "bold" : "regular"}
+                          />
+                        </Button>
+                      </div>
                       <span className="flex items-center gap-1">
                         <ChatIcon className="h-3.5 w-3.5" />
                         Reply

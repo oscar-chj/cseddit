@@ -2,7 +2,7 @@
 
 import React, { use, useEffect, useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowUpIcon, ArrowDownIcon, ShareIcon } from "@phosphor-icons/react"
+import { ArrowUpIcon, ArrowDownIcon, ShareIcon, LinkIcon, CheckIcon } from "@phosphor-icons/react"
 import {
   getPostById,
   votePost,
@@ -10,6 +10,7 @@ import {
   createAnswer,
   createComment,
   getCurrentUserId,
+  votePoll,
 } from "@/lib/mockDb"
 import { PostDetail, Comment } from "@/types"
 import { toast } from "sonner"
@@ -117,12 +118,12 @@ function InlineCommentSection({
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
             placeholder="Add a helpful comment..."
-            className="h-8 text-xs focus-visible:ring-blue-500"
+            className="h-8 rounded-none text-xs focus-visible:ring-blue-500"
           />
           <Button
             type="submit"
             size="sm"
-            className="h-8 bg-blue-600 px-3 text-xs text-white hover:bg-blue-700"
+            className="h-8 rounded-none bg-blue-600 px-3 text-xs text-white hover:bg-blue-700"
           >
             Comment
           </Button>
@@ -131,7 +132,7 @@ function InlineCommentSection({
             variant="ghost"
             size="sm"
             onClick={() => setShowForm(false)}
-            className="h-8 px-2 text-xs text-muted-foreground"
+            className="h-8 rounded-none px-2 text-xs text-muted-foreground"
           >
             Cancel
           </Button>
@@ -212,7 +213,7 @@ export default function PostDetailPage({
   const handlePostAnswer = (e: React.FormEvent) => {
     e.preventDefault()
     if (!answerContent.trim()) {
-      toast.error("Please enter answer content")
+      toast.error("Enter answer content")
       return
     }
 
@@ -235,11 +236,11 @@ export default function PostDetailPage({
   if (!mounted || !postDetail) {
     return (
       <div className="mx-auto max-w-5xl animate-pulse space-y-6 px-4 py-6">
-        <div className="h-8 w-2/3 rounded bg-muted" />
-        <div className="h-4 w-1/3 rounded bg-muted" />
+        <div className="h-8 w-2/3 rounded-none bg-muted" />
+        <div className="h-4 w-1/3 rounded-none bg-muted" />
         <div className="flex gap-4">
-          <div className="h-24 w-10 rounded bg-muted" />
-          <div className="h-48 flex-1 rounded bg-muted" />
+          <div className="h-24 w-10 rounded-none bg-muted" />
+          <div className="h-48 flex-1 rounded-none bg-muted" />
         </div>
       </div>
     )
@@ -327,9 +328,143 @@ export default function PostDetailPage({
 
             {/* Post text and tags */}
             <div className="flex-1 space-y-4">
-              <p className="text-sm leading-relaxed whitespace-pre-line text-foreground">
-                {postDetail.content}
-              </p>
+              {/* Dynamic Post Type Content */}
+              {postDetail.postType === "image" && (
+                <div className="space-y-4">
+                  {postDetail.mediaUrl && (
+                    <img
+                      src={postDetail.mediaUrl}
+                      alt={postDetail.title}
+                      className="max-h-[450px] w-auto object-contain rounded-none border border-border"
+                    />
+                  )}
+                  {postDetail.content && (
+                    <p className="text-sm leading-relaxed whitespace-pre-line text-foreground">
+                      {postDetail.content}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {postDetail.postType === "link" && (
+                <div className="space-y-4">
+                  {postDetail.mediaUrl && (
+                    <a
+                      href={postDetail.mediaUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 border border-border p-4 rounded-none bg-muted/30 hover:bg-muted/50 transition-colors text-blue-600 hover:underline"
+                    >
+                      <LinkIcon className="h-5 w-5 shrink-0" />
+                      <span className="text-sm truncate font-medium">{postDetail.mediaUrl}</span>
+                    </a>
+                  )}
+                  {postDetail.content && (
+                    <p className="text-sm leading-relaxed whitespace-pre-line text-foreground">
+                      {postDetail.content}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {postDetail.postType === "poll" && (
+                <div className="space-y-4">
+                  <div className="space-y-2 border border-border p-4 rounded-none bg-card">
+                    {(() => {
+                      const totalVotes = postDetail.pollOptions
+                        ? postDetail.pollOptions.reduce((acc, opt) => acc + opt.votes.length, 0)
+                        : 0
+                      const userVotedOptionIndex = postDetail.pollOptions
+                        ? postDetail.pollOptions.findIndex((opt) =>
+                            opt.votes.includes(currentUserId)
+                          )
+                        : -1
+                      const hasVoted = userVotedOptionIndex !== -1
+
+                      if (hasVoted) {
+                        return (
+                          <div className="space-y-3">
+                            {postDetail.pollOptions?.map((option, idx) => {
+                              const pct =
+                                totalVotes > 0
+                                  ? Math.round(
+                                      (option.votes.length / totalVotes) * 100
+                                    )
+                                  : 0
+                              const isSelected = idx === userVotedOptionIndex
+                              return (
+                                <div
+                                  key={idx}
+                                  className="relative border border-border p-3 rounded-none overflow-hidden flex justify-between items-center h-12"
+                                >
+                                  <div
+                                    className="absolute top-0 left-0 bottom-0 bg-blue-100 dark:bg-blue-900/30 transition-all duration-300"
+                                    style={{ width: `${pct}%` }}
+                                  />
+                                  <div className="relative z-10 flex items-center gap-2 font-medium text-sm text-foreground">
+                                    {option.text}
+                                    {isSelected && (
+                                      <CheckIcon className="h-4 w-4 text-blue-600 font-bold shrink-0" />
+                                    )}
+                                  </div>
+                                  <div className="relative z-10 text-xs font-semibold text-muted-foreground">
+                                    {pct}% ({option.votes.length}{" "}
+                                    {option.votes.length === 1
+                                      ? "vote"
+                                      : "votes"}
+                                    )
+                                  </div>
+                                </div>
+                              )
+                            })}
+                            <div className="text-xs text-muted-foreground pt-1">
+                              Total votes: {totalVotes}
+                            </div>
+                          </div>
+                        )
+                      } else {
+                        return (
+                          <div className="space-y-2">
+                            {postDetail.pollOptions?.map((option, idx) => (
+                              <Button
+                                key={idx}
+                                variant="outline"
+                                onClick={() => {
+                                  if (currentUserId === "anonymous") {
+                                    toast.error("Anonymous users cannot vote")
+                                    return
+                                  }
+                                  votePoll(postDetail.id, idx, currentUserId)
+                                  toast("Vote registered")
+                                  loadData()
+                                }}
+                                className="w-full justify-start rounded-none border-border text-sm py-2 px-3 font-normal text-left h-auto hover:bg-muted/50"
+                              >
+                                {option.text}
+                              </Button>
+                            ))}
+                            <div className="text-xs text-muted-foreground pt-1">
+                              Total votes: {totalVotes}
+                            </div>
+                          </div>
+                        )
+                      }
+                    })()}
+                  </div>
+                  {postDetail.content && (
+                    <p className="text-sm leading-relaxed whitespace-pre-line text-foreground">
+                      {postDetail.content}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {(!postDetail.postType || postDetail.postType === "text") &&
+                postDetail.content && (
+                  <p className="text-sm leading-relaxed whitespace-pre-line text-foreground">
+                    {postDetail.content}
+                  </p>
+                )}
 
               {/* Tags list */}
               <div className="flex flex-wrap gap-1.5">
@@ -376,7 +511,7 @@ export default function PostDetailPage({
                 value={sortBy}
                 onValueChange={(val) => setSortBy(val as "top" | "latest")}
               >
-                <SelectTrigger className="h-8 w-[140px] border-border text-xs">
+                <SelectTrigger className="h-8 w-[140px] rounded-none border-border text-xs">
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
@@ -402,7 +537,7 @@ export default function PostDetailPage({
                 return (
                   <div
                     key={answer.id}
-                    className="flex gap-4 rounded-lg border border-border bg-card p-4"
+                    className="flex gap-4 rounded-none border border-border bg-card p-4"
                   >
                     {/* Vote Sidebar */}
                     <div className="flex flex-col items-center gap-1 pt-1">
@@ -487,11 +622,11 @@ export default function PostDetailPage({
                 placeholder="Write your answer details here. Be specific and provide code examples..."
                 value={answerContent}
                 onChange={(e) => setAnswerContent(e.target.value)}
-                className="min-h-[160px] border-border p-4 text-sm focus-visible:ring-blue-500"
+                className="min-h-[160px] rounded-none border-border p-4 text-sm focus-visible:ring-blue-500"
               />
               <Button
                 type="submit"
-                className="bg-blue-600 text-white hover:bg-blue-700"
+                className="rounded-none bg-blue-600 text-white hover:bg-blue-700"
               >
                 Post Answer
               </Button>
@@ -501,7 +636,7 @@ export default function PostDetailPage({
 
         {/* Right column: Sticky guidelines / tips */}
         <div className="space-y-6 lg:col-span-3">
-          <Card className="border-border bg-muted/20">
+          <Card className="border-border bg-muted/20 rounded-none">
             <CardContent className="space-y-3 p-4">
               <h3 className="text-xs font-bold tracking-wider text-foreground uppercase">
                 Peer Review Tips
