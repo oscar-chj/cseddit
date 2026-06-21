@@ -1,24 +1,10 @@
 "use client"
 
-import React, { use, useEffect, useState, useCallback } from "react"
-import { useRouter } from "next/navigation"
-import { ArrowUpIcon, ArrowDownIcon, ShareIcon, LinkIcon, CheckIcon } from "@phosphor-icons/react"
-import {
-  getPostById,
-  votePost,
-  voteAnswer,
-  createAnswer,
-  createComment,
-  getCurrentUserId,
-  votePoll,
-} from "@/lib/mockDb"
-import { PostDetail, Comment } from "@/types"
-import { toast } from "sonner"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -26,8 +12,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Card, CardContent } from "@/components/ui/card"
+import { Textarea } from "@/components/ui/textarea"
+import {
+  createAnswer,
+  createComment,
+  getCurrentUserId,
+  getPostById,
+  voteAnswer,
+  votePoll,
+  votePost,
+} from "@/lib/mockDb"
 import { formatTimeAgo } from "@/lib/postUtils"
+import { Comment, PostDetail } from "@/types"
+import {
+  ArrowDownIcon,
+  ArrowUpIcon,
+  CheckIcon,
+  LinkIcon,
+  ShareIcon,
+} from "@phosphor-icons/react"
+import { useRouter } from "next/navigation"
+import React, { use, useCallback, useEffect, useState } from "react"
+import { toast } from "sonner"
 
 interface InlineCommentSectionProps {
   parentId: string
@@ -282,7 +288,7 @@ export default function PostDetailPage({
           {/* Question Details */}
           <div className="flex gap-4">
             {/* Voting block */}
-             <div className="flex flex-col items-center gap-1.5 pt-1">
+            <div className="flex flex-col items-center gap-1.5 pt-1">
               <Button
                 size="icon"
                 variant="ghost"
@@ -325,7 +331,7 @@ export default function PostDetailPage({
                     <img
                       src={postDetail.mediaUrl}
                       alt={postDetail.title}
-                      className="max-h-[450px] w-auto object-contain rounded-none border border-border"
+                      className="max-h-[450px] w-auto rounded-none border border-border object-contain"
                     />
                   )}
                   {postDetail.content && (
@@ -343,10 +349,12 @@ export default function PostDetailPage({
                       href={postDetail.mediaUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-3 border border-border p-4 rounded-none bg-muted/30 hover:bg-muted/50 transition-colors text-blue-600 hover:underline"
+                      className="flex items-center gap-3 rounded-none border border-border bg-muted/30 p-4 text-blue-600 transition-colors hover:bg-muted/50 hover:underline"
                     >
                       <LinkIcon className="h-5 w-5 shrink-0" />
-                      <span className="text-sm truncate font-medium">{postDetail.mediaUrl}</span>
+                      <span className="truncate text-sm font-medium">
+                        {postDetail.mediaUrl}
+                      </span>
                     </a>
                   )}
                   {postDetail.content && (
@@ -359,10 +367,13 @@ export default function PostDetailPage({
 
               {postDetail.postType === "poll" && (
                 <div className="space-y-4">
-                  <div className="space-y-2 border border-border p-4 rounded-none bg-card">
+                  <div className="space-y-2 rounded-none border border-border bg-card p-4">
                     {(() => {
                       const totalVotes = postDetail.pollOptions
-                        ? postDetail.pollOptions.reduce((acc, opt) => acc + opt.votes.length, 0)
+                        ? postDetail.pollOptions.reduce(
+                            (acc, opt) => acc + opt.votes.length,
+                            0
+                          )
                         : 0
                       const userVotedOptionIndex = postDetail.pollOptions
                         ? postDetail.pollOptions.findIndex((opt) =>
@@ -385,16 +396,16 @@ export default function PostDetailPage({
                               return (
                                 <div
                                   key={idx}
-                                  className="relative border border-border p-3 rounded-none overflow-hidden flex justify-between items-center h-12"
+                                  className="relative flex h-12 items-center justify-between overflow-hidden rounded-none border border-border p-3"
                                 >
                                   <div
-                                    className="absolute top-0 left-0 bottom-0 bg-blue-100 dark:bg-blue-900/30 transition-all duration-300"
+                                    className="absolute top-0 bottom-0 left-0 bg-blue-100 transition-all duration-300 dark:bg-blue-900/30"
                                     style={{ width: `${pct}%` }}
                                   />
-                                  <div className="relative z-10 flex items-center gap-2 font-medium text-sm text-foreground">
+                                  <div className="relative z-10 flex items-center gap-2 text-sm font-medium text-foreground">
                                     {option.text}
                                     {isSelected && (
-                                      <CheckIcon className="h-4 w-4 text-blue-600 font-bold shrink-0" />
+                                      <CheckIcon className="h-4 w-4 shrink-0 font-bold text-blue-600" />
                                     )}
                                   </div>
                                   <div className="relative z-10 text-xs font-semibold text-muted-foreground">
@@ -407,7 +418,7 @@ export default function PostDetailPage({
                                 </div>
                               )
                             })}
-                            <div className="text-xs text-muted-foreground pt-1">
+                            <div className="pt-1 text-xs text-muted-foreground">
                               Total votes: {totalVotes}
                             </div>
                           </div>
@@ -428,12 +439,12 @@ export default function PostDetailPage({
                                   toast("Vote registered")
                                   loadData()
                                 }}
-                                className="w-full justify-start rounded-none border-border text-sm py-2 px-3 font-normal text-left h-auto hover:bg-muted/50"
+                                className="h-auto w-full justify-start rounded-none border-border px-3 py-2 text-left text-sm font-normal hover:bg-muted/50"
                               >
                                 {option.text}
                               </Button>
                             ))}
-                            <div className="text-xs text-muted-foreground pt-1">
+                            <div className="pt-1 text-xs text-muted-foreground">
                               Total votes: {totalVotes}
                             </div>
                           </div>
@@ -626,7 +637,7 @@ export default function PostDetailPage({
 
         {/* Right column: Sticky guidelines / tips */}
         <div className="space-y-6 lg:col-span-3">
-          <Card className="border-border bg-muted/20 rounded-none">
+          <Card className="rounded-none border-border bg-muted/20">
             <CardContent className="space-y-3 p-4">
               <h3 className="text-xs font-bold tracking-wider text-foreground uppercase">
                 Peer Review Tips

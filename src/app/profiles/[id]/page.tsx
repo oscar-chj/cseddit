@@ -6,19 +6,19 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import {
-  getUserById,
-  getCurrentUserId,
-  updateUserProfile,
-  getPosts,
   getAnswersByUser,
+  getCurrentUserId,
+  getPosts,
+  getUserById,
+  updateUserProfile,
 } from "@/lib/mockDb"
 import { formatTimeAgo } from "@/lib/postUtils"
-import { User, Post, Answer } from "@/types"
+import { Answer, Post, User } from "@/types"
 import {
-  StarIcon,
-  ThumbsUpIcon,
   BookOpenIcon,
   ChatTeardropTextIcon,
+  StarIcon,
+  ThumbsUpIcon,
 } from "@phosphor-icons/react"
 import Link from "next/link"
 import { useParams } from "next/navigation"

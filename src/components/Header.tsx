@@ -1,18 +1,7 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
-import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
-import {
-  MagnifyingGlassIcon,
-  TrophyIcon,
-  PlusIcon,
-  ChatsIcon,
-  BellIcon,
-} from "@phosphor-icons/react"
-import { getCurrentUser, getUsers, setCurrentUserId } from "@/lib/mockDb"
-import { User } from "@/types"
-import { toast } from "sonner"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,9 +10,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { getCurrentUser, getUsers, setCurrentUserId } from "@/lib/mockDb"
+import { User } from "@/types"
+import {
+  ChatsIcon,
+  MagnifyingGlassIcon,
+  PlusIcon,
+  TrophyIcon,
+} from "@phosphor-icons/react"
+import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
+import React, { useEffect, useState } from "react"
+import { toast } from "sonner"
 
 export default function Header() {
   const router = useRouter()
@@ -76,7 +75,7 @@ export default function Header() {
         <div className="flex items-center gap-6 md:gap-8">
           <Link href="/" className="flex items-center gap-2">
             <ChatsIcon className="h-6 w-6 text-blue-600" weight="fill" />
-            <span className="hidden sm:inline text-xl font-extrabold tracking-tight text-blue-600">
+            <span className="hidden text-xl font-extrabold tracking-tight text-blue-600 sm:inline">
               CSeddit
             </span>
           </Link>
@@ -106,7 +105,7 @@ export default function Header() {
         {/* Global Search Bar */}
         <form
           onSubmit={handleSearchSubmit}
-          className="mx-1 sm:mx-8 max-w-xs sm:max-w-md flex-1"
+          className="mx-1 max-w-xs flex-1 sm:mx-8 sm:max-w-md"
         >
           <div className="relative flex items-center">
             <MagnifyingGlassIcon className="absolute left-3 h-4 w-4 text-muted-foreground" />
@@ -125,7 +124,7 @@ export default function Header() {
           <Link href="/create">
             <Button
               size="sm"
-              className="flex gap-1 bg-blue-600 text-white hover:bg-blue-700 rounded-none"
+              className="flex gap-1 rounded-none bg-blue-600 text-white hover:bg-blue-700"
             >
               <PlusIcon className="h-4 w-4" weight="bold" />
               <span className="hidden sm:inline">Ask Question</span>
@@ -134,7 +133,11 @@ export default function Header() {
 
           {/* Leaderboard Icon (Mobile only) */}
           <Link href="/leaderboard" className="md:hidden">
-            <Button size="icon" variant="ghost" className="h-9 w-9 rounded-none">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-9 w-9 rounded-none"
+            >
               <TrophyIcon className="h-5 w-5 text-muted-foreground" />
             </Button>
           </Link>
@@ -171,7 +174,10 @@ export default function Header() {
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href={`/profiles/${currentUser.id}`} className="w-full cursor-pointer">
+                  <Link
+                    href={`/profiles/${currentUser.id}`}
+                    className="w-full cursor-pointer"
+                  >
                     View profile
                   </Link>
                 </DropdownMenuItem>

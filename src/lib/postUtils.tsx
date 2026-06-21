@@ -1,5 +1,5 @@
+import { ChartBarIcon, ImageIcon, LinkIcon } from "@phosphor-icons/react"
 import React from "react"
-import { ImageIcon, LinkIcon, ChartBarIcon } from "@phosphor-icons/react"
 
 export function formatTimeAgo(timestamp: number): string {
   const diff = Date.now() - timestamp
@@ -13,8 +13,11 @@ export function formatTimeAgo(timestamp: number): string {
 }
 
 export function getPostTypeIcon(postType?: string): React.ReactNode {
-  if (postType === "image") return <ImageIcon className="h-4 w-4 text-muted-foreground shrink-0" />
-  if (postType === "link") return <LinkIcon className="h-4 w-4 text-muted-foreground shrink-0" />
-  if (postType === "poll") return <ChartBarIcon className="h-4 w-4 text-muted-foreground shrink-0" />
+  if (postType === "image")
+    return <ImageIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
+  if (postType === "link")
+    return <LinkIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
+  if (postType === "poll")
+    return <ChartBarIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
   return null
 }
