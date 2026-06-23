@@ -30,6 +30,8 @@ export interface Post {
   postType?: "text" | "image" | "link" | "poll"
   mediaUrl?: string
   pollOptions?: { text: string; votes: string[] }[]
+  authorDepartment?: string
+  authorYearOfStudy?: string
 }
 
 export interface Answer {
@@ -63,6 +65,8 @@ export interface Draft {
   postType?: "text" | "image" | "link" | "poll"
   mediaUrl?: string
   pollOptions?: { text: string; votes: string[] }[]
+  authorDepartment?: string
+  authorYearOfStudy?: string
 }
 
 export interface AnswerWithComments extends Answer {

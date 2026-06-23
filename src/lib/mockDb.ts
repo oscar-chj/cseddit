@@ -29,13 +29,21 @@ function generateUUID(): string {
 }
 
 function resolveAuthorInfo<
-  T extends { authorId: string; authorName: string; authorAvatar: string },
+  T extends {
+    authorId: string
+    authorName: string
+    authorAvatar: string
+    authorDepartment?: string
+    authorYearOfStudy?: string
+  },
 >(item: T, users: User[]): T {
   if (item.authorId === "anonymous") {
     return {
       ...item,
       authorName: "Anonymous",
       authorAvatar: "👤",
+      authorDepartment: undefined,
+      authorYearOfStudy: undefined,
     }
   }
   const user = users.find((u) => u.id === item.authorId)
@@ -44,6 +52,8 @@ function resolveAuthorInfo<
       ...item,
       authorName: user.name,
       authorAvatar: user.avatar,
+      authorDepartment: user.department,
+      authorYearOfStudy: user.yearOfStudy,
     }
   }
   return item
