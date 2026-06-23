@@ -23,6 +23,7 @@ This document explains how **CSeddit** implements and satisfies five of **Jakob 
   - Explicit **"Back to Discussions"** navigation links are located at the top of the dynamic `/posts/[id]` details view and user profile screens, offering a clear escape hatch to return home without having to rely on the browser's back button history.
   - Inline comment input panels have a dedicated **"Cancel"** action to close the inline editor immediately without saving changes.
   - The Ask Question workspace includes a Drafts sidebar, allowing users to discard/delete a draft (`TrashIcon`) at any time if they change their minds.
+  - **Hyperlinked Contributor Profiles**: Clicking on a non-anonymous author's name or avatar across post feeds, search results, thread details, answers list, or comments navigates dynamically to their academic profile, allowing rapid context building with a clear "Back to Discussions" exit route.
 
 ## 4. Consistency and Standards (Heuristic #4)
 *Users should not have to wonder whether different words, situations, or actions mean the same thing. Follow platform and industry conventions.*
@@ -34,6 +35,7 @@ This document explains how **CSeddit** implements and satisfies five of **Jakob 
 ## 5. Error Prevention (Heuristic #5)
 *Even better than good error messages is a careful design which prevents a problem from occurring in the first place.*
 - **Implementation in CSeddit**:
+  - Replaced aggressive validation warning styles (like red borders and error micro-copy text labels) on `/create` with a helpful, friendly **"Post Requirements Guide"** checklist card. The guide dynamically checks off items (e.g. providing a title and tab-specific details) with green ticks once satisfied.
+  - Form submission buttons ("Post") and draft saving actions are dynamically disabled until all required rules in the checklist guide are successfully satisfied, preventing invalid submittals before they occur.
   - All submission forms (new questions, answers, and comments) dynamically inspect inputs and **disable the submit button** until all required text validation checks are satisfied.
   - If a user inputs empty spaces or leaves fields blank, the system prevents submission before it occurs rather than allowing a bad API request or throwing a validation alert *after* clicking.
-  - Required inputs display immediate outline changes (red borders via `border-destructive`) and micro-copy helper error text explaining the input constraint.
