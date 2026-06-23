@@ -116,9 +116,11 @@ export default function Header() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="h-9 w-full rounded-none border-muted bg-muted/50 pl-9 pr-14 focus-visible:ring-blue-500"
             />
-            <div className="absolute right-3 hidden items-center text-[9px] font-mono text-muted-foreground border border-border px-1 py-0.5 rounded-none bg-background select-none pointer-events-none sm:flex">
-              ↵ Enter
-            </div>
+            {searchQuery.trim() !== "" && (
+              <div className="absolute right-3 hidden items-center text-[9px] font-mono text-muted-foreground border border-border px-1 py-0.5 rounded-none bg-background select-none pointer-events-none sm:flex">
+                ↵ Enter
+              </div>
+            )}
           </div>
         </form>
 
