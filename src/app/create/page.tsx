@@ -1,6 +1,6 @@
 "use client"
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -17,6 +17,7 @@ import {
 } from "@/lib/mockDb"
 import { Draft, User } from "@/types"
 import {
+  CheckIcon,
   CodeIcon,
   FloppyDiskIcon,
   ListBulletsIcon,
@@ -30,6 +31,8 @@ import {
 import { useRouter } from "next/navigation"
 import React, { useEffect, useState } from "react"
 import { toast } from "sonner"
+import { Spinner } from "@/components/ui/spinner"
+import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 
 const AVAILABLE_TAGS = [
   "React",
@@ -57,6 +60,37 @@ export default function AskQuestionPage() {
   const [activeDraftId, setActiveDraftId] = useState<string | null>(null)
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [mounted, setMounted] = useState(false)
+  const [isPosting, setIsPosting] = useState(false)
+  const [postDepartment, setPostDepartment] = useState("None/General")
+  const [postYear, setPostYear] = useState("None/General")
+
+  const isTitleEmpty = title.trim() === ""
+
+  const isContentEmpty =
+    activeTab === "text"
+      ? content.trim() === ""
+      : activeTab === "image"
+        ? mediaUrl.trim() === ""
+        : activeTab === "link"
+          ? mediaUrl.trim() === ""
+          : activeTab === "poll"
+            ? pollOptions.filter((opt) => opt.trim() !== "").length < 2
+            : false
+
+  const hasNoContentToSave =
+    title.trim() === "" &&
+    content.trim() === "" &&
+    mediaUrl.trim() === "" &&
+    pollOptions.every((opt) => opt.trim() === "")
+
+  const contentRequirementText =
+    activeTab === "text"
+      ? "Provide question details (body)"
+      : activeTab === "image"
+        ? "Provide an image/video URL"
+        : activeTab === "link"
+          ? "Provide an external link URL"
+          : "Provide at least 2 poll options"
 
   useEffect(() => {
     const draftsList = getDrafts()
@@ -67,6 +101,8 @@ export default function AskQuestionPage() {
       setCurrentUser(user)
       if (user) {
         setIsAnonymous(user.anonymousByDefault)
+        setPostDepartment(user.department || "None/General")
+        setPostYear(user.yearOfStudy || "None/General")
       }
     }, 0)
   }, [])
@@ -132,32 +168,38 @@ export default function AskQuestionPage() {
       }
     }
 
-    const currentUserId = getCurrentUserId()
-    const newPost = createPost({
-      title: title.trim(),
-      content: content.trim(),
-      tags: selectedTags,
-      authorId: isAnonymous ? "anonymous" : currentUserId,
-      isFeatured: false,
-      postType: activeTab as "text" | "image" | "link" | "poll",
-      mediaUrl:
-        activeTab === "image" || activeTab === "link"
-          ? mediaUrl.trim()
-          : undefined,
-      pollOptions:
-        activeTab === "poll"
-          ? pollOptions
-              .filter((opt) => opt.trim() !== "")
-              .map((opt) => ({ text: opt.trim(), votes: [] }))
-          : undefined,
-    })
+    setIsPosting(true)
+    setTimeout(() => {
+      const currentUserId = getCurrentUserId()
+      const newPost = createPost({
+        title: title.trim(),
+        content: content.trim(),
+        tags: selectedTags,
+        authorId: isAnonymous ? "anonymous" : currentUserId,
+        isFeatured: false,
+        postType: activeTab as "text" | "image" | "link" | "poll",
+        mediaUrl:
+          activeTab === "image" || activeTab === "link"
+            ? mediaUrl.trim()
+            : undefined,
+        pollOptions:
+          activeTab === "poll"
+            ? pollOptions
+                .filter((opt) => opt.trim() !== "")
+                .map((opt) => ({ text: opt.trim(), votes: [] }))
+            : undefined,
+        department: postDepartment === "None/General" ? undefined : postDepartment,
+        yearOfStudy: postYear === "None/General" ? undefined : postYear,
+      })
 
-    if (activeDraftId) {
-      deleteDraft(activeDraftId)
-    }
+      if (activeDraftId) {
+        deleteDraft(activeDraftId)
+      }
 
-    toast("Post published")
-    router.push(`/posts/${newPost.id}`)
+      setIsPosting(false)
+      toast.success("Post published successfully")
+      router.push(`/posts/${newPost.id}`)
+    }, 500)
   }
 
   const handleSaveDraft = () => {
@@ -187,6 +229,8 @@ export default function AskQuestionPage() {
         activeTab === "poll"
           ? pollOptions.map((opt) => ({ text: opt.trim(), votes: [] }))
           : undefined,
+      department: postDepartment === "None/General" ? undefined : postDepartment,
+      yearOfStudy: postYear === "None/General" ? undefined : postYear,
     })
 
     setActiveDraftId(draft.id)
@@ -207,6 +251,8 @@ export default function AskQuestionPage() {
     } else {
       setPollOptions(["", ""])
     }
+    setPostDepartment(draft.department || "None/General")
+    setPostYear(draft.yearOfStudy || "None/General")
     toast("Draft loaded")
   }
 
@@ -222,6 +268,8 @@ export default function AskQuestionPage() {
       setActiveTab("text")
       setMediaUrl("")
       setPollOptions(["", ""])
+      setPostDepartment(currentUser?.department || "None/General")
+      setPostYear(currentUser?.yearOfStudy || "None/General")
     }
     setDrafts(getDrafts())
     toast("Draft deleted")
@@ -351,7 +399,7 @@ export default function AskQuestionPage() {
                 }
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="h-10 rounded-none border-border text-sm focus-visible:ring-blue-500"
+                className="h-10 rounded-none text-sm focus-visible:ring-blue-500 border-border"
               />
             </div>
 
@@ -361,7 +409,9 @@ export default function AskQuestionPage() {
                 <Label className="text-sm font-bold text-foreground">
                   Question body
                 </Label>
-                <div className="overflow-hidden rounded-none border border-border focus-within:ring-2 focus-within:ring-blue-500">
+                <div
+                  className="overflow-hidden rounded-none border focus-within:ring-2 focus-within:ring-blue-500 border-border"
+                >
                   {/* Editor Toolbar */}
                   <div className="flex flex-wrap items-center gap-1 border-b border-border bg-muted/40 p-2">
                     <Button
@@ -447,7 +497,7 @@ export default function AskQuestionPage() {
                     placeholder="https://example.com/image.jpg"
                     value={mediaUrl}
                     onChange={(e) => setMediaUrl(e.target.value)}
-                    className="h-10 rounded-none border-border text-sm focus-visible:ring-blue-500"
+                    className="h-10 rounded-none text-sm focus-visible:ring-blue-500 border-border"
                   />
                 </div>
                 <div className="space-y-2">
@@ -482,7 +532,7 @@ export default function AskQuestionPage() {
                     placeholder="https://github.com"
                     value={mediaUrl}
                     onChange={(e) => setMediaUrl(e.target.value)}
-                    className="h-10 rounded-none border-border text-sm focus-visible:ring-blue-500"
+                    className="h-10 rounded-none text-sm focus-visible:ring-blue-500 border-border"
                   />
                 </div>
                 <div className="space-y-2">
@@ -509,7 +559,9 @@ export default function AskQuestionPage() {
                   <Label className="text-sm font-bold text-foreground">
                     Poll options editor
                   </Label>
-                  <div className="space-y-2 rounded-none border border-border bg-muted/10 p-3">
+                  <div
+                    className="space-y-2 rounded-none border bg-muted/10 p-3 border-border"
+                  >
                     {pollOptions.map((option, idx) => (
                       <div key={idx} className="flex items-center gap-2">
                         <span className="w-16 shrink-0 text-xs font-medium text-muted-foreground">
@@ -581,6 +633,45 @@ export default function AskQuestionPage() {
               </div>
             )}
 
+            {/* Custom Department and Year tag selectors */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="post-department" className="text-sm font-bold text-foreground">
+                  Post Department Tag
+                </Label>
+                <NativeSelect
+                  id="post-department"
+                  value={postDepartment}
+                  onChange={(e) => setPostDepartment(e.target.value)}
+                  className="w-full"
+                >
+                  <NativeSelectOption value="None/General">None/General</NativeSelectOption>
+                  <NativeSelectOption value="Computer Science">Computer Science</NativeSelectOption>
+                  <NativeSelectOption value="Software Engineering">Software Engineering</NativeSelectOption>
+                  <NativeSelectOption value="Networking">Networking</NativeSelectOption>
+                  <NativeSelectOption value="Multimedia">Multimedia</NativeSelectOption>
+                </NativeSelect>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="post-year" className="text-sm font-bold text-foreground">
+                  Post Year Tag
+                </Label>
+                <NativeSelect
+                  id="post-year"
+                  value={postYear}
+                  onChange={(e) => setPostYear(e.target.value)}
+                  className="w-full"
+                >
+                  <NativeSelectOption value="None/General">None/General</NativeSelectOption>
+                  <NativeSelectOption value="1st Year">1st Year</NativeSelectOption>
+                  <NativeSelectOption value="2nd Year">2nd Year</NativeSelectOption>
+                  <NativeSelectOption value="3rd Year">3rd Year</NativeSelectOption>
+                  <NativeSelectOption value="4th Year">4th Year</NativeSelectOption>
+                </NativeSelect>
+              </div>
+            </div>
+
             {/* Tags Selection */}
             <div className="space-y-2">
               <Label className="text-sm font-bold text-foreground">
@@ -611,14 +702,20 @@ export default function AskQuestionPage() {
             <div className="flex items-center gap-3 pt-2">
               <Button
                 onClick={handlePost}
+                disabled={isTitleEmpty || isContentEmpty || isPosting}
                 className="h-10 gap-1.5 rounded-none bg-blue-600 px-5 text-white hover:bg-blue-700"
               >
-                <PaperPlaneTiltIcon className="h-4 w-4" weight="bold" />
+                {isPosting ? (
+                  <Spinner className="h-4 w-4" />
+                ) : (
+                  <PaperPlaneTiltIcon className="h-4 w-4" weight="bold" />
+                )}
                 Post
               </Button>
               <Button
                 variant="outline"
                 onClick={handleSaveDraft}
+                disabled={hasNoContentToSave}
                 className="h-10 gap-1.5 rounded-none border-border transition-colors hover:bg-blue-50 hover:text-blue-600"
               >
                 <FloppyDiskIcon className="h-4 w-4" />
@@ -630,6 +727,50 @@ export default function AskQuestionPage() {
 
         {/* Sidebar drafts */}
         <div className="space-y-4 lg:col-span-1">
+          {/* Post Requirements Guide */}
+          <div className="space-y-3 rounded-none border border-border bg-card p-4">
+            <h3 className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+              Post Requirements Guide
+            </h3>
+            <div className="space-y-3">
+              {/* Requirement 1: Title */}
+              <div className="flex items-center gap-2.5">
+                {!isTitleEmpty ? (
+                  <div className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-none bg-green-500/10 text-green-600 dark:text-green-400 border border-green-600/20">
+                    <CheckIcon className="h-3 w-3" weight="bold" />
+                  </div>
+                ) : (
+                  <div className="h-4.5 w-4.5 shrink-0 border border-muted-foreground/30 rounded-none" />
+                )}
+                <span
+                  className={`text-xs font-medium transition-colors ${
+                    !isTitleEmpty ? "text-green-600 dark:text-green-400" : "text-muted-foreground"
+                  }`}
+                >
+                  Provide a descriptive title
+                </span>
+              </div>
+
+              {/* Requirement 2: Content */}
+              <div className="flex items-center gap-2.5">
+                {!isContentEmpty ? (
+                  <div className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-none bg-green-500/10 text-green-600 dark:text-green-400 border border-green-600/20">
+                    <CheckIcon className="h-3 w-3" weight="bold" />
+                  </div>
+                ) : (
+                  <div className="h-4.5 w-4.5 shrink-0 border border-muted-foreground/30 rounded-none" />
+                )}
+                <span
+                  className={`text-xs font-medium transition-colors ${
+                    !isContentEmpty ? "text-green-600 dark:text-green-400" : "text-muted-foreground"
+                  }`}
+                >
+                  {contentRequirementText}
+                </span>
+              </div>
+            </div>
+          </div>
+
           <h2 className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
             Your saved drafts
           </h2>
