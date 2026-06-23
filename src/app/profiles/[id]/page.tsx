@@ -22,7 +22,7 @@ import {
 } from "@phosphor-icons/react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { toast } from "sonner"
 
 export default function UserProfilePage() {
@@ -37,7 +37,7 @@ export default function UserProfilePage() {
   const [mounted, setMounted] = useState(false)
   const [currentUserId, setCurrentUserId] = useState("")
 
-  const loadData = () => {
+  const loadData = useCallback(() => {
     const targetUser = getUserById(profileId)
     const loggedInId = getCurrentUserId()
     setCurrentUserId(loggedInId)
@@ -49,14 +49,14 @@ export default function UserProfilePage() {
       setUserPosts(filtered)
       setUserAnswers(getAnswersByUser(targetUser.id))
     }
-  }
+  }, [profileId])
 
   useEffect(() => {
     setTimeout(() => {
       setMounted(true)
       loadData()
     }, 0)
-  }, [profileId])
+  }, [loadData])
 
   const handleToggleAnonymity = (checked: boolean) => {
     if (!user) return
@@ -250,7 +250,7 @@ export default function UserProfilePage() {
                     <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                       <span>Asked {formatTimeAgo(post.timestamp)}</span>
                       <span>•</span>
-                      <div className="flex items-center gap-1">
+                      <div className="flex flex-wrap items-center gap-1.5">
                         {post.authorDepartment && (
                           <Badge
                             className="rounded-none bg-blue-50 text-blue-700 hover:bg-blue-50 border-none text-xs font-normal"
