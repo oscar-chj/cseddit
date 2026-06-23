@@ -251,6 +251,20 @@ export default function UserProfilePage() {
                       <span>Asked {formatTimeAgo(post.timestamp)}</span>
                       <span>•</span>
                       <div className="flex items-center gap-1">
+                        {post.authorDepartment && (
+                          <Badge
+                            className="rounded-none bg-blue-50 text-blue-700 hover:bg-blue-50 border-none text-xs font-normal"
+                          >
+                            Dept: {post.authorDepartment}
+                          </Badge>
+                        )}
+                        {post.authorYearOfStudy && (
+                          <Badge
+                            className="rounded-none bg-purple-50 text-purple-700 hover:bg-purple-50 border-none text-xs font-normal"
+                          >
+                            Year: {post.authorYearOfStudy}
+                          </Badge>
+                        )}
                         {post.tags.map((tag) => (
                           <Badge
                             key={tag}

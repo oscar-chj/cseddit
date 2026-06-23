@@ -261,6 +261,20 @@ export default function Dashboard() {
                     <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
                       {/* Tags */}
                       <div className="flex flex-wrap items-center gap-1.5">
+                        {post.authorDepartment && (
+                          <Badge
+                            className="rounded-none bg-blue-50 text-blue-700 hover:bg-blue-50 border-none text-xs font-normal"
+                          >
+                            Dept: {post.authorDepartment}
+                          </Badge>
+                        )}
+                        {post.authorYearOfStudy && (
+                          <Badge
+                            className="rounded-none bg-purple-50 text-purple-700 hover:bg-purple-50 border-none text-xs font-normal"
+                          >
+                            Year: {post.authorYearOfStudy}
+                          </Badge>
+                        )}
                         {post.tags.map((tag) => (
                           <Badge
                             key={tag}
