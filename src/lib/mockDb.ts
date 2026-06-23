@@ -35,6 +35,8 @@ function resolveAuthorInfo<
     authorAvatar: string
     authorDepartment?: string
     authorYearOfStudy?: string
+    department?: string
+    yearOfStudy?: string
   },
 >(item: T, users: User[]): T {
   if (item.authorId === "anonymous") {
@@ -42,8 +44,8 @@ function resolveAuthorInfo<
       ...item,
       authorName: "Anonymous",
       authorAvatar: "👤",
-      authorDepartment: undefined,
-      authorYearOfStudy: undefined,
+      authorDepartment: item.department || undefined,
+      authorYearOfStudy: item.yearOfStudy || undefined,
     }
   }
   const user = users.find((u) => u.id === item.authorId)
@@ -52,8 +54,8 @@ function resolveAuthorInfo<
       ...item,
       authorName: user.name,
       authorAvatar: user.avatar,
-      authorDepartment: user.department,
-      authorYearOfStudy: user.yearOfStudy,
+      authorDepartment: item.department || user.department,
+      authorYearOfStudy: item.yearOfStudy || user.yearOfStudy,
     }
   }
   return item
@@ -496,6 +498,8 @@ export function createPost(
     authorName: "",
     authorAvatar: "",
     isFeatured: postInput.isFeatured ?? false,
+    department: postInput.department,
+    yearOfStudy: postInput.yearOfStudy,
   }
   posts.unshift(newPost)
   setRaw("cseddit_posts", posts)
@@ -765,7 +769,12 @@ export function saveDraft(
   if (id) {
     const index = drafts.findIndex((d) => d.id === id)
     if (index !== -1) {
-      drafts[index] = { ...draftInput, id }
+      drafts[index] = {
+        ...draftInput,
+        id,
+        department: draftInput.department,
+        yearOfStudy: draftInput.yearOfStudy,
+      }
       setRaw("cseddit_drafts", drafts)
       return drafts[index]
     }
@@ -775,6 +784,8 @@ export function saveDraft(
   const newDraft: Draft = {
     ...draftInput,
     id,
+    department: draftInput.department,
+    yearOfStudy: draftInput.yearOfStudy,
   }
   drafts.push(newDraft)
   setRaw("cseddit_drafts", drafts)

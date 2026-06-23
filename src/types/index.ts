@@ -32,6 +32,8 @@ export interface Post {
   pollOptions?: { text: string; votes: string[] }[]
   authorDepartment?: string
   authorYearOfStudy?: string
+  department?: string
+  yearOfStudy?: string
 }
 
 export interface Answer {
@@ -67,6 +69,8 @@ export interface Draft {
   pollOptions?: { text: string; votes: string[] }[]
   authorDepartment?: string
   authorYearOfStudy?: string
+  department?: string
+  yearOfStudy?: string
 }
 
 export interface AnswerWithComments extends Answer {
