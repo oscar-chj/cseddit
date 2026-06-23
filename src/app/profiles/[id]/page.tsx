@@ -15,6 +15,7 @@ import {
 import { formatTimeAgo } from "@/lib/postUtils"
 import { Answer, Post, User } from "@/types"
 import {
+  ArrowLeftIcon,
   BookOpenIcon,
   ChatTeardropTextIcon,
   StarIcon,
@@ -102,6 +103,16 @@ export default function UserProfilePage() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-8 px-4 py-6">
+      <div className="mb-4">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-blue-600"
+        >
+          <ArrowLeftIcon className="h-3.5 w-3.5" />
+          <span>Back to Discussions</span>
+        </Link>
+      </div>
+
       {/* Profile Header Card */}
       <Card className="overflow-hidden rounded-none border-border bg-card">
         <CardContent className="p-6 sm:p-8">
