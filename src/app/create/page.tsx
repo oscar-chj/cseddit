@@ -30,6 +30,7 @@ import {
 import { useRouter } from "next/navigation"
 import React, { useEffect, useState } from "react"
 import { toast } from "sonner"
+import { Spinner } from "@/components/ui/spinner"
 
 const AVAILABLE_TAGS = [
   "React",
@@ -57,6 +58,26 @@ export default function AskQuestionPage() {
   const [activeDraftId, setActiveDraftId] = useState<string | null>(null)
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [mounted, setMounted] = useState(false)
+  const [isPosting, setIsPosting] = useState(false)
+
+  const isTitleEmpty = title.trim() === ""
+
+  const isContentEmpty =
+    activeTab === "text"
+      ? content.trim() === ""
+      : activeTab === "image"
+        ? mediaUrl.trim() === ""
+        : activeTab === "link"
+          ? mediaUrl.trim() === ""
+          : activeTab === "poll"
+            ? pollOptions.filter((opt) => opt.trim() !== "").length < 2
+            : false
+
+  const hasNoContentToSave =
+    title.trim() === "" &&
+    content.trim() === "" &&
+    mediaUrl.trim() === "" &&
+    pollOptions.every((opt) => opt.trim() === "")
 
   useEffect(() => {
     const draftsList = getDrafts()
@@ -132,32 +153,36 @@ export default function AskQuestionPage() {
       }
     }
 
-    const currentUserId = getCurrentUserId()
-    const newPost = createPost({
-      title: title.trim(),
-      content: content.trim(),
-      tags: selectedTags,
-      authorId: isAnonymous ? "anonymous" : currentUserId,
-      isFeatured: false,
-      postType: activeTab as "text" | "image" | "link" | "poll",
-      mediaUrl:
-        activeTab === "image" || activeTab === "link"
-          ? mediaUrl.trim()
-          : undefined,
-      pollOptions:
-        activeTab === "poll"
-          ? pollOptions
-              .filter((opt) => opt.trim() !== "")
-              .map((opt) => ({ text: opt.trim(), votes: [] }))
-          : undefined,
-    })
+    setIsPosting(true)
+    setTimeout(() => {
+      const currentUserId = getCurrentUserId()
+      const newPost = createPost({
+        title: title.trim(),
+        content: content.trim(),
+        tags: selectedTags,
+        authorId: isAnonymous ? "anonymous" : currentUserId,
+        isFeatured: false,
+        postType: activeTab as "text" | "image" | "link" | "poll",
+        mediaUrl:
+          activeTab === "image" || activeTab === "link"
+            ? mediaUrl.trim()
+            : undefined,
+        pollOptions:
+          activeTab === "poll"
+            ? pollOptions
+                .filter((opt) => opt.trim() !== "")
+                .map((opt) => ({ text: opt.trim(), votes: [] }))
+            : undefined,
+      })
 
-    if (activeDraftId) {
-      deleteDraft(activeDraftId)
-    }
+      if (activeDraftId) {
+        deleteDraft(activeDraftId)
+      }
 
-    toast("Post published")
-    router.push(`/posts/${newPost.id}`)
+      setIsPosting(false)
+      toast.success("Post published successfully")
+      router.push(`/posts/${newPost.id}`)
+    }, 500)
   }
 
   const handleSaveDraft = () => {
@@ -351,8 +376,13 @@ export default function AskQuestionPage() {
                 }
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="h-10 rounded-none border-border text-sm focus-visible:ring-blue-500"
+                className={`h-10 rounded-none text-sm focus-visible:ring-blue-500 ${
+                  isTitleEmpty ? "border-destructive" : "border-border"
+                }`}
               />
+              {isTitleEmpty && (
+                <p className="text-xs text-destructive mt-1 font-mono">Title is required</p>
+              )}
             </div>
 
             {/* Dynamic rendering of other inputs */}
@@ -361,7 +391,9 @@ export default function AskQuestionPage() {
                 <Label className="text-sm font-bold text-foreground">
                   Question body
                 </Label>
-                <div className="overflow-hidden rounded-none border border-border focus-within:ring-2 focus-within:ring-blue-500">
+                <div className={`overflow-hidden rounded-none border focus-within:ring-2 focus-within:ring-blue-500 ${
+                  content.trim() === "" ? "border-destructive" : "border-border"
+                }`}>
                   {/* Editor Toolbar */}
                   <div className="flex flex-wrap items-center gap-1 border-b border-border bg-muted/40 p-2">
                     <Button
@@ -430,6 +462,9 @@ export default function AskQuestionPage() {
                     className="min-h-[220px] resize-y rounded-none border-0 p-4 text-sm focus-visible:ring-0"
                   />
                 </div>
+                {content.trim() === "" && (
+                  <p className="text-xs text-destructive mt-1 font-mono">Question body details are required</p>
+                )}
               </div>
             )}
 
@@ -447,8 +482,13 @@ export default function AskQuestionPage() {
                     placeholder="https://example.com/image.jpg"
                     value={mediaUrl}
                     onChange={(e) => setMediaUrl(e.target.value)}
-                    className="h-10 rounded-none border-border text-sm focus-visible:ring-blue-500"
+                    className={`h-10 rounded-none text-sm focus-visible:ring-blue-500 ${
+                      mediaUrl.trim() === "" ? "border-destructive" : "border-border"
+                    }`}
                   />
+                  {mediaUrl.trim() === "" && (
+                    <p className="text-xs text-destructive mt-1 font-mono">Image URL is required</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label
@@ -482,8 +522,13 @@ export default function AskQuestionPage() {
                     placeholder="https://github.com"
                     value={mediaUrl}
                     onChange={(e) => setMediaUrl(e.target.value)}
-                    className="h-10 rounded-none border-border text-sm focus-visible:ring-blue-500"
+                    className={`h-10 rounded-none text-sm focus-visible:ring-blue-500 ${
+                      mediaUrl.trim() === "" ? "border-destructive" : "border-border"
+                    }`}
                   />
+                  {mediaUrl.trim() === "" && (
+                    <p className="text-xs text-destructive mt-1 font-mono">External link URL is required</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label
@@ -562,6 +607,9 @@ export default function AskQuestionPage() {
                       )}
                     </div>
                   </div>
+                  {pollOptions.filter((opt) => opt.trim() !== "").length < 2 && (
+                    <p className="text-xs text-destructive mt-1 font-mono">At least 2 non-empty options are required</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label
@@ -611,14 +659,20 @@ export default function AskQuestionPage() {
             <div className="flex items-center gap-3 pt-2">
               <Button
                 onClick={handlePost}
+                disabled={isTitleEmpty || isContentEmpty || isPosting}
                 className="h-10 gap-1.5 rounded-none bg-blue-600 px-5 text-white hover:bg-blue-700"
               >
-                <PaperPlaneTiltIcon className="h-4 w-4" weight="bold" />
+                {isPosting ? (
+                  <Spinner className="h-4 w-4" />
+                ) : (
+                  <PaperPlaneTiltIcon className="h-4 w-4" weight="bold" />
+                )}
                 Post
               </Button>
               <Button
                 variant="outline"
                 onClick={handleSaveDraft}
+                disabled={hasNoContentToSave}
                 className="h-10 gap-1.5 rounded-none border-border transition-colors hover:bg-blue-50 hover:text-blue-600"
               >
                 <FloppyDiskIcon className="h-4 w-4" />
