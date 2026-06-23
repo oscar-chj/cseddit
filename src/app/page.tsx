@@ -100,16 +100,32 @@ export default function Dashboard() {
               >
                 <CardHeader className="p-4 pb-2">
                   <div className="mb-2 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Avatar className="h-6 w-6">
-                        <AvatarFallback className="bg-blue-100 text-[10px] text-blue-800">
-                          {post.authorAvatar}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="max-w-[120px] truncate text-xs font-medium text-muted-foreground">
-                        {post.authorName}
-                      </span>
-                    </div>
+                    {post.authorId !== "anonymous" ? (
+                      <Link
+                        href={`/profiles/${post.authorId}`}
+                        className="flex items-center gap-2 hover:text-blue-600 group"
+                      >
+                        <Avatar className="h-6 w-6 cursor-pointer">
+                          <AvatarFallback className="bg-blue-100 text-[10px] text-blue-800">
+                            {post.authorAvatar}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="max-w-[120px] truncate text-xs font-medium text-muted-foreground group-hover:text-blue-600 group-hover:underline">
+                          {post.authorName}
+                        </span>
+                      </Link>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-6 w-6">
+                          <AvatarFallback className="bg-blue-100 text-[10px] text-blue-800">
+                            {post.authorAvatar}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="max-w-[120px] truncate text-xs font-medium text-muted-foreground">
+                          {post.authorName}
+                        </span>
+                      </div>
+                    )}
                     <Badge
                       variant="secondary"
                       className="border-none bg-blue-50 px-2 text-[10px] font-normal text-blue-700 hover:bg-blue-50"
@@ -228,14 +244,32 @@ export default function Dashboard() {
                   {/* Main content body */}
                   <div className="flex-1 space-y-2">
                     <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                      <Avatar className="h-5 w-5">
-                        <AvatarFallback className="bg-blue-100 text-[8px] text-blue-800">
-                          {post.authorAvatar}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="font-semibold text-foreground">
-                        {post.authorName}
-                      </span>
+                      {post.authorId !== "anonymous" ? (
+                        <Link
+                          href={`/profiles/${post.authorId}`}
+                          className="flex items-center gap-2 hover:text-blue-600 group"
+                        >
+                          <Avatar className="h-5 w-5 cursor-pointer">
+                            <AvatarFallback className="bg-blue-100 text-[8px] text-blue-800">
+                              {post.authorAvatar}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="font-semibold text-foreground group-hover:text-blue-600 group-hover:underline">
+                            {post.authorName}
+                          </span>
+                        </Link>
+                      ) : (
+                        <>
+                          <Avatar className="h-5 w-5">
+                            <AvatarFallback className="bg-blue-100 text-[8px] text-blue-800">
+                              {post.authorAvatar}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="font-semibold text-foreground">
+                            {post.authorName}
+                          </span>
+                        </>
+                      )}
                       <span>•</span>
                       <span>{formatTimeAgo(post.timestamp)}</span>
                       {post.isFeatured && (

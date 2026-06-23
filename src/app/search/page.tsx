@@ -206,14 +206,32 @@ function SearchResultsContent() {
                     {/* Main content body */}
                     <div className="flex-1 space-y-2">
                       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                        <Avatar className="h-5 w-5">
-                          <AvatarFallback className="bg-blue-100 text-[8px] text-blue-800">
-                            {post.authorAvatar}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="font-semibold text-foreground">
-                          {post.authorName}
-                        </span>
+                        {post.authorId !== "anonymous" ? (
+                          <Link
+                            href={`/profiles/${post.authorId}`}
+                            className="flex items-center gap-2 hover:text-blue-600 group"
+                          >
+                            <Avatar className="h-5 w-5 cursor-pointer">
+                              <AvatarFallback className="bg-blue-100 text-[8px] text-blue-800">
+                                {post.authorAvatar}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="font-semibold text-foreground group-hover:text-blue-600 group-hover:underline">
+                              {post.authorName}
+                            </span>
+                          </Link>
+                        ) : (
+                          <>
+                            <Avatar className="h-5 w-5">
+                              <AvatarFallback className="bg-blue-100 text-[8px] text-blue-800">
+                                {post.authorAvatar}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="font-semibold text-foreground">
+                              {post.authorName}
+                            </span>
+                          </>
+                        )}
                         <span>•</span>
                         <span>{formatTimeAgo(post.timestamp)}</span>
                         {post.isFeatured && (
