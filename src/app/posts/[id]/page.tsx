@@ -395,7 +395,7 @@ export default function PostDetailPage({
               {postDetail.postType === "image" && (
                 <div className="space-y-4">
                   {postDetail.mediaUrl && (
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    /* eslint-disable-next-line @next/next/no-img-element */
                     <img
                       src={postDetail.mediaUrl}
                       alt={postDetail.title}
