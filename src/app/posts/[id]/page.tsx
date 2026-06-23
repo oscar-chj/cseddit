@@ -24,13 +24,16 @@ import {
 } from "@/lib/mockDb"
 import { formatTimeAgo } from "@/lib/postUtils"
 import { Comment, PostDetail } from "@/types"
+import { Spinner } from "@/components/ui/spinner"
 import {
   ArrowDownIcon,
+  ArrowLeftIcon,
   ArrowUpIcon,
   CheckIcon,
   LinkIcon,
   ShareIcon,
 } from "@phosphor-icons/react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import React, { use, useCallback, useEffect, useState } from "react"
 import { toast } from "sonner"
@@ -48,11 +51,17 @@ function InlineCommentSection({
 }: InlineCommentSectionProps) {
   const [showForm, setShowForm] = useState(false)
   const [commentText, setCommentText] = useState("")
+  const [isPosting, setIsPosting] = useState(false)
   const currentUserId = getCurrentUserId()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!commentText.trim()) return
+    if (!commentText.trim() || isPosting) return
+
+    setIsPosting(true)
+
+    // Simulated 500ms delay
+    await new Promise((resolve) => setTimeout(resolve, 500))
 
     createComment({
       parentId,
@@ -62,8 +71,9 @@ function InlineCommentSection({
 
     setCommentText("")
     setShowForm(false)
+    setIsPosting(false)
     onCommentAdded()
-    toast("Comment posted")
+    toast.success("Comment posted successfully")
   }
 
   return (
@@ -113,20 +123,23 @@ function InlineCommentSection({
           <Input
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
+            disabled={isPosting}
             placeholder="Add a helpful comment..."
             className="h-8 rounded-none text-xs focus-visible:ring-blue-500"
           />
           <Button
             type="submit"
+            disabled={commentText.trim() === "" || isPosting}
             size="sm"
-            className="h-8 rounded-none bg-blue-600 px-3 text-xs text-white hover:bg-blue-700"
+            className="h-8 rounded-none bg-blue-600 px-3 text-xs text-white hover:bg-blue-700 flex items-center justify-center gap-1"
           >
-            Comment
+            {isPosting ? <Spinner className="text-white" /> : "Comment"}
           </Button>
           <Button
             type="button"
             variant="ghost"
             size="sm"
+            disabled={isPosting}
             onClick={() => setShowForm(false)}
             className="h-8 rounded-none px-2 text-xs text-muted-foreground"
           >
@@ -152,6 +165,7 @@ export default function PostDetailPage({
   const [sortBy, setSortBy] = useState<"top" | "latest">("top")
   const [mounted, setMounted] = useState(false)
   const [currentUserId, setCurrentUserIdState] = useState("")
+  const [isPostingAnswer, setIsPostingAnswer] = useState(false)
 
   const loadData = useCallback(() => {
     const detail = getPostById(postId)
@@ -206,12 +220,16 @@ export default function PostDetailPage({
     toast(`Vote recorded`)
   }
 
-  const handlePostAnswer = (e: React.FormEvent) => {
+  const handlePostAnswer = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!answerContent.trim()) {
-      toast.error("Enter answer content")
+    if (!answerContent.trim() || isPostingAnswer) {
       return
     }
+
+    setIsPostingAnswer(true)
+
+    // Simulated 500ms delay
+    await new Promise((resolve) => setTimeout(resolve, 500))
 
     createAnswer({
       postId,
@@ -220,8 +238,9 @@ export default function PostDetailPage({
     })
 
     setAnswerContent("")
+    setIsPostingAnswer(false)
     loadData()
-    toast("Answer posted")
+    toast.success("Answer posted successfully")
   }
 
   const handleShare = () => {
@@ -261,6 +280,16 @@ export default function PostDetailPage({
 
   return (
     <div className="mx-auto max-w-5xl space-y-8 px-4 py-6">
+      <div className="mb-4">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-blue-600"
+        >
+          <ArrowLeftIcon className="h-3.5 w-3.5" />
+          <span>Back to Discussions</span>
+        </Link>
+      </div>
+
       {/* Header Info */}
       <div className="space-y-3 border-b border-border pb-4">
         <h1 className="text-xl leading-tight font-bold text-foreground md:text-2xl">
@@ -469,6 +498,22 @@ export default function PostDetailPage({
 
               {/* Tags list */}
               <div className="flex flex-wrap gap-1.5">
+                {postDetail.authorDepartment && (
+                  <Badge
+                    variant="outline"
+                    className="rounded-none bg-blue-50 text-blue-700 hover:bg-blue-50 border-none text-xs font-normal"
+                  >
+                    Dept: {postDetail.authorDepartment}
+                  </Badge>
+                )}
+                {postDetail.authorYearOfStudy && (
+                  <Badge
+                    variant="outline"
+                    className="rounded-none bg-purple-50 text-purple-700 hover:bg-purple-50 border-none text-xs font-normal"
+                  >
+                    Year: {postDetail.authorYearOfStudy}
+                  </Badge>
+                )}
                 {postDetail.tags.map((tag) => (
                   <Badge
                     key={tag}
@@ -623,13 +668,16 @@ export default function PostDetailPage({
                 placeholder="Write your answer details here. Be specific and provide code examples..."
                 value={answerContent}
                 onChange={(e) => setAnswerContent(e.target.value)}
+                disabled={isPostingAnswer}
                 className="min-h-[160px] rounded-none border-border p-4 text-sm focus-visible:ring-blue-500"
               />
               <Button
                 type="submit"
-                className="rounded-none bg-blue-600 text-white hover:bg-blue-700"
+                disabled={answerContent.trim() === "" || isPostingAnswer}
+                className="rounded-none bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2"
               >
-                Post Answer
+                {isPostingAnswer && <Spinner className="text-white" />}
+                <span>Post Answer</span>
               </Button>
             </form>
           </div>
