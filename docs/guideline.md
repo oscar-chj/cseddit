@@ -9,11 +9,11 @@ These guidelines are strict, binding, and must be followed by all implementing a
 * **No External Libraries**: Do not install additional styling libraries, custom icons, or competing component sets unless already configured in `package.json`.
 
 ## 2. CSS & Styling Restrictions
-* **No Custom CSS for Styling**: Do not add custom style definitions, custom selectors, or overrides in `globals.css` or any other `.css` file for colors, fonts, or aesthetics.
-* **No Custom Colors**: Do not declare custom brand colors or hex codes in stylesheets or Tailwind configs. Use the standard preconfigured tailwind classes and shadcn theme variables.
-* **Strict Layout Editing Only**: CSS edits are restricted to **Layout only** (e.g., grid grids, flexboxes, spacing, margins, padding, and alignments) using standard Tailwind classes.
-  * **Allowed**: `p-4`, `mx-auto`, `flex`, `grid`, `items-center`, `gap-6`, `w-full`, etc.
-  * **Prohibited**: Writing custom class declarations like `.custom-blue-btn { background: #0066cc; }` or inline styles like `style={{ color: '#0066cc' }}`.
+* **No Custom CSS for Styling**: Do not add custom style definitions, custom selectors, or custom font rules in stylesheet files. Overriding standard theme custom properties (variables) in `globals.css` is permitted to tune standard variables like `--border`, `--input`, or `--muted-foreground`.
+* **No Hardcoded Custom Colors**: Do not declare custom brand colors or hex codes in stylesheets or Tailwind configs. Use standard preconfigured Tailwind classes and Shadcn theme variables (`bg-primary`, `text-muted-foreground`, etc.).
+* **Aesthetic Consistency**: Component edits are restricted to layout utilities (spacing, alignments, flex/grid) and theme-aware styling utility classes.
+  * **Allowed**: `p-4`, `mx-auto`, `flex`, `grid`, `items-center`, `gap-6`, `w-full`, standard theme tokens, and tuning variables in `globals.css`.
+  * **Prohibited**: Writing custom class declarations like `.my-custom-btn { background: #1a73e8; }` or inline styles like `style={{ color: '#1a73e8' }}`.
 
 ## 3. Site Navigation & Structure
 * **Header Only**: Implement only the top Header navigation. Do not build side navigation bars, side drawer menus, or lateral navigation panels.

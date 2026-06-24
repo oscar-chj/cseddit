@@ -28,7 +28,7 @@ This document explains how **CSeddit** implements and satisfies five of **Jakob 
 ## 4. Consistency and Standards (Heuristic #4)
 *Users should not have to wonder whether different words, situations, or actions mean the same thing. Follow platform and industry conventions.*
 - **Implementation in CSeddit**:
-  - The design system strictly enforces a **flat, sharp-corners styling policy** (`rounded-none` on all inputs, select filters, dropdown panels, skeletons, badges, and toaster frames), establishing a coherent monospace-themed standard.
+  - The design system utilizes standard theme rounded corners (`rounded-lg`, `rounded-md`, `rounded-sm` on inputs, select filters, cards, dropdown panels, skeletons, badges, and toaster frames) to ensure a modern, polished, and consistent layout aligned with Radix UI design tokens.
   - Phosphor Icon conventions are maintained uniformly (e.g. `ArrowUpIcon` / `ArrowDownIcon` for voting, `ArrowLeftIcon` for back actions, and standard icons representing post types).
   - Common naming layouts and metadata structures are kept consistent across feed views, search pages, profile lists, and details.
 

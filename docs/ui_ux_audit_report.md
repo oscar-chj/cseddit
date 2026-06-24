@@ -6,29 +6,27 @@ This document presents a comprehensive UI/UX audit of the **CSeddit** web applic
 
 ## 1. Design Theme & Style Selection
 
-### Sharp Corners (`rounded-none`) & Monospace Typography (`font-mono`)
-CSeddit utilizes a **Neo-Brutalist** or **Retro-Technical** design theme. The entire application uses sharp 90-degree corners (`rounded-none` on cards, buttons, tabs, input fields, and badges) and a monospaced font family (`font-mono` on `html`).
+### Monospace Typography (`font-mono`) & Standard Rounded Corners
+CSeddit utilizes a **Modernized Retro-Technical** design theme. While the application maintains a monospaced font family (`font-mono` on `html`) to preserve a developer-focused look, it utilizes standard theme rounded corners (`rounded-lg`, `rounded-md`, `rounded-sm` on cards, buttons, tabs, input fields, and badges) aligned with Radix UI design tokens.
 
-* **Why square instead of rounded circles?**
-  * **Semantic Alignment:** "CSeddit" is a Computer Science focused social forum. Monospace typography and square container grids directly mimic terminal shells, retro computers, and code editors (like VS Code or Vim).
-  * **Stylistic Contrast:** It departs from typical consumer social apps that use organic, soft rounded curves, making it immediately feel technical, structured, and developer-oriented.
-  * **Visual Polish:** Within Brutalist constraints, the spacing (using standard 8px incremental grids) keeps the interface highly organized and aligned with the "technical documentation" aesthetic.
+* **Why rounded corners instead of sharp corners?**
+  * **Brutalist Modernization:** The initial implementation used strict, sharp 90-degree corners (`rounded-none`). Transitioning to theme-based rounded corners increases visual polish and layout consistency without losing the structured "technical document" aesthetic.
+  * **Improved Usability:** Softened corners help visually separate container boundaries (like input forms or cards) and provide standard interactive focus rings that look clean and modern.
 
 ---
 
 ## 2. Color Palette & User Friendliness
 
 ### Overall Palette Assessment
-The application uses a **neutral monochrome base** (`oklch` grays, whites, and blacks) with a **vibrant blue accent** (`oklch(0.205 0 0)` or Tailwind `blue-600`/`blue-700`).
+The application uses a **neutral monochrome base** (`oklch` grays, whites, and blacks) with a **theme-aware primary accent** (utilizing Radix/Shadcn variables like `primary`, `muted-foreground`, and `border`) that adapts to light and dark modes.
 
 * **User Friendliness:**
-  * **Blue Accents:** Excellent for links, primary call-to-actions (e.g., "Ask Question"), and active tab states. Blue is universally recognized as the interactive standard, providing great discoverability.
+  * **Theme-Aware Accents:** Replaced hardcoded brand colors (`blue-600`/`blue-700`) with semantic theme variables for actions, links, active states, and focus rings.
   * **Semantic Grouping:**
-    * **Upvotes/Downvotes:** Blue is used for positive/upvoted states, and red is used for downvotes/negative states. This is standard and intuitive.
-    * **Categorization Badges:** Department tags (blue) and Year of Study tags (purple) are visually separated, helping users scan metadata easily.
-  * **Dark Mode Visual Inconsistency:**
-    * Badges like `<Badge className="bg-blue-50 text-blue-700">` and `<Badge className="bg-purple-50 text-purple-700">` use hardcoded light-theme colors. In dark mode, they render as highly luminous blocks, creating visual noise and breaking the dark mode aesthetic.
-    * Avatar fallbacks (`bg-blue-100 text-blue-800`) are also hardcoded and do not adapt to dark mode.
+    * **Upvotes/Downvotes:** Styled using theme-aware colors (`bg-primary/10 text-primary` for active upvote, `bg-destructive/10 text-destructive` for active downvote) ensuring robust contrast in both themes.
+    * **Categorization Badges:** Department tags (rendered in standard `secondary` variant) and Year of Study tags (rendered in standard `outline` variant) are visually separated, helping users scan metadata easily.
+  * **Dark Mode Visual Adaptability:**
+    * Hardcoded light-theme color badges and avatar fallbacks have been removed. All elements now use semantic, adaptive variables that invert cleanly in dark mode.
 
 ---
 
@@ -100,3 +98,15 @@ Below is a detailed list of compliance issues mapped directly to code locations:
 
 ### D. Standardize Typography micro-details
 1. Replace straight triple-dots `...` with the proper ellipsis character `…` in placeholders and loading/redirect texts.
+
+---
+
+## 7. Audit Resolution Status
+
+All audited issues list in Section 5 and Section 6 have been fully addressed:
+- [x] **Contrast Ratios:** Muted foreground set to `oklch(0.45 0 0)` (contrast ~5.6:1). Active vote button states styled dynamically.
+- [x] **Theme-Aware Badges:** Hardcoded `blue`/`purple`/`emerald` colors replaced with adaptive, theme-compliant colors (`bg-primary/10`, `bg-destructive/10`, `bg-secondary`, `bg-outline`).
+- [x] **Accessibility (ARIA):** `aria-label` tags added to all icon-only buttons (vote blocks, draft deletion bins) and the search input bar.
+- [x] **Typography Ellipses:** Straight `...` fully replaced with typographic single character `…` in placeholders, redirect screens, and comment boxes.
+- [x] **Borders & Cursors:** Globally increased border definition (`oklch(0.85 0 0)` in light mode, `20%` opacity in dark mode), and configured cursor-pointer hovers globally.
+

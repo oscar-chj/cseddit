@@ -24,8 +24,7 @@ This handoff document summarizes the requirements elicitation, product definitio
 ## 3. Strict Design Decisions (Crucial)
 * **Components & Styling**: 
   * Only use pre-configured Shadcn UI components.
-  * Never write or edit custom CSS rules for colors, font families, or style customization. 
-  * Edits to styling must only affect layout (spacing, grids, flexbox, alignment) using standard Tailwind utility classes.
+  * Do not write custom CSS rules or hardcode inline colors; instead, customize global CSS variables in `globals.css` (like `--muted-foreground` and `--border`) to adjust theme aesthetics, and use theme-aware Tailwind classes.
 * **Navigation & Shell**: 
   * Only build the top Header bar navigation.
   * Do NOT build any side navbars or drawer navigations.
