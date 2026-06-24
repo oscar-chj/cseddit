@@ -2,6 +2,7 @@
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
@@ -75,8 +76,8 @@ export default function UserProfilePage() {
   if (!mounted) {
     return (
       <div className="mx-auto max-w-4xl animate-pulse space-y-6 px-4 py-6">
-        <div className="h-48 rounded-none bg-muted" />
-        <div className="h-32 rounded-none bg-muted" />
+        <div className="h-48 bg-muted" />
+        <div className="h-32 bg-muted" />
       </div>
     )
   }
@@ -89,11 +90,11 @@ export default function UserProfilePage() {
           The contributor profile you are trying to view does not exist.
         </p>
         <div className="pt-2">
-          <Link href="/">
-            <button className="rounded-none bg-blue-600 px-4 py-2 text-sm text-white transition-colors hover:bg-blue-700">
+          <Button asChild>
+            <Link href="/">
               Back to Dashboard
-            </button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </div>
     )
@@ -106,7 +107,7 @@ export default function UserProfilePage() {
       <div className="mb-4">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-blue-600"
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-primary"
         >
           <ArrowLeftIcon className="h-3.5 w-3.5" />
           <span>Back to Discussions</span>
@@ -114,13 +115,13 @@ export default function UserProfilePage() {
       </div>
 
       {/* Profile Header Card */}
-      <Card className="overflow-hidden rounded-none border-border bg-card">
+      <Card className="overflow-hidden border-border bg-card">
         <CardContent className="p-6 sm:p-8">
           <div className="flex flex-col items-center gap-6 md:flex-row md:items-start md:gap-8">
             {/* Left Column: Avatar & Badges */}
             <div className="flex min-w-[150px] flex-col items-center gap-4">
               <Avatar className="flex h-24 w-24 items-center justify-center border border-border shadow-sm">
-                <AvatarFallback className="bg-blue-100 text-4xl font-semibold text-blue-800">
+                <AvatarFallback className="text-4xl font-semibold">
                   {user.avatar}
                 </AvatarFallback>
               </Avatar>
@@ -130,7 +131,7 @@ export default function UserProfilePage() {
                 <span className="block text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
                   Earned Badges
                 </span>
-                <div className="flex items-center justify-center gap-1.5 rounded-none border border-border bg-muted/40 px-3 py-1.5">
+                <div className="flex items-center justify-center gap-1.5 border border-border bg-muted/40 px-3 py-1.5 rounded-md">
                   {user.badges.map((badge, idx) => (
                     <span
                       key={idx}
@@ -160,13 +161,13 @@ export default function UserProfilePage() {
                 <div className="flex flex-wrap items-center justify-center gap-1.5 md:justify-start">
                   <Badge
                     variant="secondary"
-                    className="rounded-none px-2 text-[10px] font-normal"
+                    className="px-2 text-[10px] font-normal"
                   >
                     Dept: {user.department}
                   </Badge>
                   <Badge
                     variant="outline"
-                    className="rounded-none border-border px-2 text-[10px] font-normal"
+                    className="border-border px-2 text-[10px] font-normal"
                   >
                     Year: {user.yearOfStudy}
                   </Badge>
@@ -179,8 +180,8 @@ export default function UserProfilePage() {
 
               {/* Stats Counters */}
               <div className="flex flex-wrap items-center justify-center gap-4 pt-2 sm:gap-6 md:justify-start">
-                <div className="flex items-center gap-2 rounded-none border border-blue-500/20 bg-blue-500/10 px-3.5 py-2">
-                  <StarIcon className="h-5 w-5 text-blue-500" weight="fill" />
+                <div className="flex items-center gap-2 border border-border bg-muted/30 px-3.5 py-2 rounded-md">
+                  <StarIcon className="h-5 w-5 text-primary" weight="fill" />
                   <div className="text-left">
                     <span className="block text-sm leading-none font-bold text-foreground">
                       {user.reputation}
@@ -191,9 +192,9 @@ export default function UserProfilePage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 rounded-none border border-emerald-500/20 bg-emerald-500/10 px-3.5 py-2">
+                <div className="flex items-center gap-2 border border-border bg-muted/30 px-3.5 py-2 rounded-md">
                   <ThumbsUpIcon
-                    className="h-5 w-5 text-emerald-500"
+                    className="h-5 w-5 text-primary"
                     weight="fill"
                   />
                   <div className="text-left">
@@ -214,7 +215,6 @@ export default function UserProfilePage() {
                     id="default-anonymity"
                     checked={user.anonymousByDefault}
                     onCheckedChange={handleToggleAnonymity}
-                    className="data-[state=checked]:bg-blue-600"
                   />
                   <Label
                     htmlFor="default-anonymity"
@@ -232,18 +232,18 @@ export default function UserProfilePage() {
       {/* User's Created Posts Feed */}
       <div className="space-y-4">
         <h2 className="flex items-center gap-2 border-b border-border pb-2 text-base font-bold text-foreground">
-          <BookOpenIcon className="h-5 w-5 text-blue-600" />
+          <BookOpenIcon className="h-5 w-5 text-primary" />
           Questions ({userPosts.length})
         </h2>
 
         {userPosts.length === 0 ? (
-          <div className="rounded-none border border-dashed p-8 text-center text-sm text-muted-foreground">
+          <div className="border border-dashed rounded-lg p-8 text-center text-sm text-muted-foreground">
             {isOwnProfile
               ? "You haven't asked any questions yet."
               : "No questions asked by this contributor yet."}
           </div>
         ) : (
-          <div className="divide-y divide-border overflow-hidden rounded-none border bg-card">
+          <div className="divide-y divide-border overflow-hidden border rounded-lg bg-card">
             {userPosts.map((post) => {
               const postScore = post.upvotes.length - post.downvotes.length
               return (
@@ -254,7 +254,7 @@ export default function UserProfilePage() {
                   <div className="flex-1 space-y-1.5">
                     <Link
                       href={`/posts/${post.id}`}
-                      className="block text-sm font-bold text-foreground transition-colors hover:text-blue-600 sm:text-base"
+                      className="block text-sm font-bold text-foreground transition-colors hover:text-primary sm:text-base"
                     >
                       {post.title}
                     </Link>
@@ -263,16 +263,12 @@ export default function UserProfilePage() {
                       <span>•</span>
                       <div className="flex flex-wrap items-center gap-1.5">
                         {post.authorDepartment && (
-                          <Badge
-                            className="rounded-none bg-blue-50 text-blue-700 hover:bg-blue-50 border-none text-xs font-normal"
-                          >
+                          <Badge variant="secondary" className="text-xs font-normal">
                             Dept: {post.authorDepartment}
                           </Badge>
                         )}
                         {post.authorYearOfStudy && (
-                          <Badge
-                            className="rounded-none bg-purple-50 text-purple-700 hover:bg-purple-50 border-none text-xs font-normal"
-                          >
+                          <Badge variant="outline" className="text-xs font-normal">
                             Year: {post.authorYearOfStudy}
                           </Badge>
                         )}
@@ -280,7 +276,7 @@ export default function UserProfilePage() {
                           <Badge
                             key={tag}
                             variant="outline"
-                            className="rounded-none border-border py-0 text-[10px] font-normal text-muted-foreground transition-colors hover:bg-blue-50 hover:text-blue-600"
+                            className="border-border py-0 text-[10px] font-normal text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
                           >
                             {tag}
                           </Badge>
@@ -289,7 +285,7 @@ export default function UserProfilePage() {
                     </div>
                   </div>
 
-                  <div className="flex min-w-[60px] flex-col items-center justify-center rounded-none border border-border bg-muted/40 px-3 py-1.5 text-center">
+                  <div className="flex min-w-[60px] flex-col items-center justify-center border border-border bg-muted/40 px-3 py-1.5 text-center rounded-md">
                     <span className="text-xs font-bold text-foreground">
                       {postScore}
                     </span>
@@ -307,18 +303,18 @@ export default function UserProfilePage() {
       {/* User's Answers */}
       <div className="space-y-4 pt-4">
         <h2 className="flex items-center gap-2 border-b border-border pb-2 text-base font-bold text-foreground">
-          <ChatTeardropTextIcon className="h-5 w-5 text-blue-600" />
+          <ChatTeardropTextIcon className="h-5 w-5 text-primary" />
           Answers ({userAnswers.length})
         </h2>
 
         {userAnswers.length === 0 ? (
-          <div className="rounded-none border border-dashed p-8 text-center text-sm text-muted-foreground">
+          <div className="border border-dashed rounded-lg p-8 text-center text-sm text-muted-foreground">
             {isOwnProfile
               ? "You haven't answered any questions yet."
               : "No answers posted by this contributor yet."}
           </div>
         ) : (
-          <div className="divide-y divide-border overflow-hidden rounded-none border bg-card">
+          <div className="divide-y divide-border overflow-hidden border rounded-lg bg-card">
             {userAnswers.map((answer) => {
               const answerScore =
                 answer.upvotes.length - answer.downvotes.length
@@ -330,7 +326,7 @@ export default function UserProfilePage() {
                   <div className="min-w-0 flex-1 space-y-1.5">
                     <Link
                       href={`/posts/${answer.postId}`}
-                      className="block truncate text-sm font-semibold text-foreground transition-colors hover:text-blue-600 sm:text-base"
+                      className="block truncate text-sm font-semibold text-foreground transition-colors hover:text-primary sm:text-base"
                     >
                       {answer.postTitle}
                     </Link>
@@ -342,7 +338,7 @@ export default function UserProfilePage() {
                     </span>
                   </div>
 
-                  <div className="flex min-w-[60px] shrink-0 flex-col items-center justify-center rounded-none border border-border bg-muted/40 px-3 py-1.5 text-center">
+                  <div className="flex min-w-[60px] shrink-0 flex-col items-center justify-center border border-border bg-muted/40 px-3 py-1.5 text-center rounded-md">
                     <span className="text-xs font-bold text-foreground">
                       {answerScore}
                     </span>
