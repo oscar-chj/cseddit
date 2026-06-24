@@ -10,7 +10,7 @@ Developers and technical students often lack a high-density, web-based Q&A space
 
 ### Key Focus Areas:
 1. **Stack Overflow Core**: Centered around Questions, Answers, and threaded comments on both the posts and answers.
-2. **Information Density & Blue Aesthetic**: Desktop-first layout utilizing a professional blue primary accent color (`#2563eb`) for actions, links, navigation indicators, and active states.
+2. **Information Density & Theme-Aware Aesthetic**: Desktop-first layout utilizing professional theme-aware primary accent colors (using Tailwind CSS and Radix theme variables rather than hardcoded colors) for actions, links, navigation indicators, and active states, adapting smoothly to light and dark modes.
 3. **No Side Navigation**: Only use a top header for primary navigation. Side navbars are strictly excluded.
 4. **No Footer**: The layout has no footer component.
 5. **Gamified Reputation System**: Dynamic reputation scoring mapped clearly on user profiles and leaderboard screens.
@@ -125,8 +125,8 @@ Developers and technical students often lack a high-density, web-based Q&A space
 
 ### Technical Stack & Styling Rules
 * **Frontend**: Next.js App Router (using routes like `/`, `/create`, `/search`, `/posts/[id]`, `/profile`, `/leaderboard`).
-* **Styling**: TailwindCSS v4 with professional blue styling tokens.
-* **Component Restriction**: Developers MUST only use Shadcn UI components. Writing custom CSS files or editing Tailwind config files for custom colors and styling is strictly prohibited. Customization is restricted to styling layout (spacing, alignment, grids) using standard Tailwind classes and Shadcn parameters. Refer to [guideline.md](file:///d:/GitHub%20Repositories/cseddit/docs/guideline.md).
+* **Styling**: TailwindCSS v4 using adaptive theme-aware styling tokens.
+* **Component Restriction**: Developers MUST only use Shadcn UI components. Writing custom inline styles or hardcoded color classes (e.g. blue-600) is strictly prohibited. Customization should leverage standard Tailwind layout utilities and standard theme CSS variables (like `primary`, `muted-foreground`, etc.). Refer to [guideline.md](file:///d:/GitHub%20Repositories/cseddit/docs/guideline.md).
 * **Database / State**: A local utility file `src/lib/mockDb.ts` that initializes standard seed data in `localStorage` if empty, and manages reads/writes.
 
 ### Reputation Formula

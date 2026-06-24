@@ -1,6 +1,6 @@
 "use client"
 
-import { Avatar } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -32,7 +32,13 @@ import { useRouter } from "next/navigation"
 import React, { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { Spinner } from "@/components/ui/spinner"
-import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 const AVAILABLE_TAGS = [
   "React",
@@ -188,7 +194,8 @@ export default function AskQuestionPage() {
                 .filter((opt) => opt.trim() !== "")
                 .map((opt) => ({ text: opt.trim(), votes: [] }))
             : undefined,
-        department: postDepartment === "None/General" ? undefined : postDepartment,
+        department:
+          postDepartment === "None/General" ? undefined : postDepartment,
         yearOfStudy: postYear === "None/General" ? undefined : postYear,
       })
 
@@ -229,7 +236,8 @@ export default function AskQuestionPage() {
         activeTab === "poll"
           ? pollOptions.map((opt) => ({ text: opt.trim(), votes: [] }))
           : undefined,
-      department: postDepartment === "None/General" ? undefined : postDepartment,
+      department:
+        postDepartment === "None/General" ? undefined : postDepartment,
       yearOfStudy: postYear === "None/General" ? undefined : postYear,
     })
 
@@ -299,14 +307,14 @@ export default function AskQuestionPage() {
               <button
                 type="button"
                 onClick={() => setIsAnonymous(false)}
-                className={`flex cursor-pointer items-start gap-3 rounded-none border p-3 text-left transition-all ${
+                className={`flex cursor-pointer items-start gap-3 border p-3 text-left rounded-lg transition-all ${
                   !isAnonymous
-                    ? "border-blue-600 bg-blue-50/5 ring-1 ring-blue-600 dark:bg-blue-950/20"
+                    ? "border-primary bg-primary/5 ring-1 ring-primary"
                     : "border-border bg-card hover:bg-muted/40"
                 }`}
               >
-                <Avatar className="flex h-10 w-10 shrink-0 items-center justify-center rounded-none">
-                  {currentUser?.avatar || "👾"}
+                <Avatar className="size-10 shrink-0">
+                  <AvatarFallback>{currentUser?.avatar || "👾"}</AvatarFallback>
                 </Avatar>
                 <div className="space-y-0.5">
                   <p className="text-sm font-bold text-foreground">
@@ -322,14 +330,14 @@ export default function AskQuestionPage() {
               <button
                 type="button"
                 onClick={() => setIsAnonymous(true)}
-                className={`flex cursor-pointer items-start gap-3 rounded-none border p-3 text-left transition-all ${
+                className={`flex cursor-pointer items-start gap-3 border p-3 text-left rounded-lg transition-all ${
                   isAnonymous
-                    ? "border-blue-600 bg-blue-50/5 ring-1 ring-blue-600 dark:bg-blue-950/20"
+                    ? "border-primary bg-primary/5 ring-1 ring-primary"
                     : "border-border bg-card hover:bg-muted/40"
                 }`}
               >
-                <Avatar className="flex h-10 w-10 shrink-0 items-center justify-center rounded-none">
-                  👤
+                <Avatar className="size-10 shrink-0">
+                  <AvatarFallback>👤</AvatarFallback>
                 </Avatar>
                 <div className="space-y-0.5">
                   <p className="text-sm font-bold text-foreground">
@@ -349,28 +357,28 @@ export default function AskQuestionPage() {
             onValueChange={setActiveTab}
             className="w-full"
           >
-            <TabsList className="grid h-10 w-full grid-cols-4 rounded-none border border-border bg-muted p-1">
+            <TabsList className="grid h-10 w-full grid-cols-4 border border-border bg-muted p-1 rounded-lg">
               <TabsTrigger
                 value="text"
-                className="rounded-none border-0 text-xs data-[state=active]:bg-background"
+                className="border-0 text-xs data-[state=active]:bg-background"
               >
                 Text
               </TabsTrigger>
               <TabsTrigger
                 value="image"
-                className="rounded-none border-0 text-xs data-[state=active]:bg-background"
+                className="border-0 text-xs data-[state=active]:bg-background"
               >
                 Image/video
               </TabsTrigger>
               <TabsTrigger
                 value="link"
-                className="rounded-none border-0 text-xs data-[state=active]:bg-background"
+                className="border-0 text-xs data-[state=active]:bg-background"
               >
                 Link
               </TabsTrigger>
               <TabsTrigger
                 value="poll"
-                className="rounded-none border-0 text-xs data-[state=active]:bg-background"
+                className="border-0 text-xs data-[state=active]:bg-background"
               >
                 Poll
               </TabsTrigger>
@@ -399,7 +407,7 @@ export default function AskQuestionPage() {
                 }
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="h-10 rounded-none text-sm focus-visible:ring-blue-500 border-border"
+                className="h-10 border-border text-sm"
               />
             </div>
 
@@ -409,15 +417,13 @@ export default function AskQuestionPage() {
                 <Label className="text-sm font-bold text-foreground">
                   Question body
                 </Label>
-                <div
-                  className="overflow-hidden rounded-none border focus-within:ring-2 focus-within:ring-blue-500 border-border"
-                >
+                <div className="overflow-hidden rounded-lg border border-border focus-within:ring-2 focus-within:ring-ring/30 focus-within:border-ring">
                   {/* Editor Toolbar */}
                   <div className="flex flex-wrap items-center gap-1 border-b border-border bg-muted/40 p-2">
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="h-8 w-8 text-muted-foreground hover:text-blue-600"
+                      className="h-8 w-8 text-muted-foreground"
                       onClick={() => insertMarkdown("**", "**")}
                       title="Bold"
                     >
@@ -426,7 +432,7 @@ export default function AskQuestionPage() {
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="h-8 w-8 text-muted-foreground hover:text-blue-600"
+                      className="h-8 w-8 text-muted-foreground"
                       onClick={() => insertMarkdown("*", "*")}
                       title="Italic"
                     >
@@ -435,7 +441,7 @@ export default function AskQuestionPage() {
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="h-8 w-8 text-muted-foreground hover:text-blue-600"
+                      className="h-8 w-8 text-muted-foreground"
                       onClick={() => insertMarkdown("<u>", "</u>")}
                       title="Underline"
                     >
@@ -445,7 +451,7 @@ export default function AskQuestionPage() {
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="h-8 w-8 text-muted-foreground hover:text-blue-600"
+                      className="h-8 w-8 text-muted-foreground"
                       onClick={() => insertMarkdown("- ", "")}
                       title="Bullet list"
                     >
@@ -454,7 +460,7 @@ export default function AskQuestionPage() {
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="h-8 w-8 text-muted-foreground hover:text-blue-600"
+                      className="h-8 w-8 text-muted-foreground"
                       onClick={() => insertMarkdown("1. ", "")}
                       title="Numbered list"
                     >
@@ -463,7 +469,7 @@ export default function AskQuestionPage() {
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="h-8 w-8 text-muted-foreground hover:text-blue-600"
+                      className="h-8 w-8 text-muted-foreground"
                       onClick={() => insertMarkdown("`", "`")}
                       title="Inline code"
                     >
@@ -474,10 +480,10 @@ export default function AskQuestionPage() {
                   {/* Textarea */}
                   <Textarea
                     id="question-body"
-                    placeholder="Introduce the problem and expand on what you've tried..."
+                    placeholder="Introduce the problem and expand on what you've tried…"
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
-                    className="min-h-[220px] resize-y rounded-none border-0 p-4 text-sm focus-visible:ring-0"
+                    className="min-h-[220px] resize-y border-0 p-4 text-sm focus-visible:ring-0"
                   />
                 </div>
               </div>
@@ -497,7 +503,7 @@ export default function AskQuestionPage() {
                     placeholder="https://example.com/image.jpg"
                     value={mediaUrl}
                     onChange={(e) => setMediaUrl(e.target.value)}
-                    className="h-10 rounded-none text-sm focus-visible:ring-blue-500 border-border"
+                    className="h-10 border-border text-sm"
                   />
                 </div>
                 <div className="space-y-2">
@@ -509,10 +515,10 @@ export default function AskQuestionPage() {
                   </Label>
                   <Textarea
                     id="image-description"
-                    placeholder="Add a description or caption for your image/video..."
+                    placeholder="Add a description or caption for your image/video…"
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
-                    className="min-h-[120px] resize-y rounded-none border-border p-4 text-sm focus-visible:ring-blue-500"
+                    className="min-h-[120px] resize-y border-border p-4 text-sm"
                   />
                 </div>
               </div>
@@ -532,7 +538,7 @@ export default function AskQuestionPage() {
                     placeholder="https://github.com"
                     value={mediaUrl}
                     onChange={(e) => setMediaUrl(e.target.value)}
-                    className="h-10 rounded-none text-sm focus-visible:ring-blue-500 border-border"
+                    className="h-10 border-border text-sm"
                   />
                 </div>
                 <div className="space-y-2">
@@ -544,10 +550,10 @@ export default function AskQuestionPage() {
                   </Label>
                   <Textarea
                     id="link-description"
-                    placeholder="Add some description or commentary about this link..."
+                    placeholder="Add some description or commentary about this link…"
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
-                    className="min-h-[120px] resize-y rounded-none border-border p-4 text-sm focus-visible:ring-blue-500"
+                    className="min-h-[120px] resize-y border-border p-4 text-sm"
                   />
                 </div>
               </div>
@@ -559,9 +565,7 @@ export default function AskQuestionPage() {
                   <Label className="text-sm font-bold text-foreground">
                     Poll options editor
                   </Label>
-                  <div
-                    className="space-y-2 rounded-none border bg-muted/10 p-3 border-border"
-                  >
+                  <div className="space-y-2 border border-border bg-muted/10 p-3">
                     {pollOptions.map((option, idx) => (
                       <div key={idx} className="flex items-center gap-2">
                         <span className="w-16 shrink-0 text-xs font-medium text-muted-foreground">
@@ -575,7 +579,7 @@ export default function AskQuestionPage() {
                             newOptions[idx] = e.target.value
                             setPollOptions(newOptions)
                           }}
-                          className="h-10 flex-1 rounded-none border-border text-sm focus-visible:ring-blue-500"
+                          className="h-10 flex-1 border-border text-sm"
                         />
                         {pollOptions.length > 2 && (
                           <Button
@@ -588,7 +592,7 @@ export default function AskQuestionPage() {
                               )
                               setPollOptions(newOptions)
                             }}
-                            className="h-9 shrink-0 rounded-none border-border px-3 text-xs text-muted-foreground hover:border-destructive hover:text-destructive"
+                            className="h-9 shrink-0 border-border px-3 text-xs text-muted-foreground hover:border-destructive hover:text-destructive"
                           >
                             <TrashIcon className="mr-1 h-3.5 w-3.5" />
                             Remove option
@@ -607,7 +611,7 @@ export default function AskQuestionPage() {
                               setPollOptions([...pollOptions, ""])
                             }
                           }}
-                          className="rounded-none border-border text-xs transition-colors hover:bg-blue-50 hover:text-blue-600"
+                          className="border-border text-xs transition-colors"
                         >
                           Add option
                         </Button>
@@ -624,10 +628,10 @@ export default function AskQuestionPage() {
                   </Label>
                   <Textarea
                     id="poll-description"
-                    placeholder="Add some context or details for this poll..."
+                    placeholder="Add some context or details for this poll…"
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
-                    className="min-h-[120px] resize-y rounded-none border-border p-4 text-sm focus-visible:ring-blue-500"
+                    className="min-h-[120px] resize-y border-border p-4 text-sm"
                   />
                 </div>
               </div>
@@ -636,39 +640,51 @@ export default function AskQuestionPage() {
             {/* Custom Department and Year tag selectors */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="post-department" className="text-sm font-bold text-foreground">
+                <Label
+                  htmlFor="post-department"
+                  className="text-sm font-bold text-foreground"
+                >
                   Post Department Tag
                 </Label>
-                <NativeSelect
-                  id="post-department"
+                <Select
                   value={postDepartment}
-                  onChange={(e) => setPostDepartment(e.target.value)}
-                  className="w-full"
+                  onValueChange={setPostDepartment}
                 >
-                  <NativeSelectOption value="None/General">None/General</NativeSelectOption>
-                  <NativeSelectOption value="Computer Science">Computer Science</NativeSelectOption>
-                  <NativeSelectOption value="Software Engineering">Software Engineering</NativeSelectOption>
-                  <NativeSelectOption value="Networking">Networking</NativeSelectOption>
-                  <NativeSelectOption value="Multimedia">Multimedia</NativeSelectOption>
-                </NativeSelect>
+                  <SelectTrigger id="post-department" className="w-full border-border text-xs rounded-lg">
+                    <SelectValue placeholder="Select Department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="None/General" className="text-xs">None/General</SelectItem>
+                    <SelectItem value="Computer Science" className="text-xs">Computer Science</SelectItem>
+                    <SelectItem value="Software Engineering" className="text-xs">Software Engineering</SelectItem>
+                    <SelectItem value="Networking" className="text-xs">Networking</SelectItem>
+                    <SelectItem value="Multimedia" className="text-xs">Multimedia</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-
+ 
               <div className="space-y-2">
-                <Label htmlFor="post-year" className="text-sm font-bold text-foreground">
+                <Label
+                  htmlFor="post-year"
+                  className="text-sm font-bold text-foreground"
+                >
                   Post Year Tag
                 </Label>
-                <NativeSelect
-                  id="post-year"
+                <Select
                   value={postYear}
-                  onChange={(e) => setPostYear(e.target.value)}
-                  className="w-full"
+                  onValueChange={setPostYear}
                 >
-                  <NativeSelectOption value="None/General">None/General</NativeSelectOption>
-                  <NativeSelectOption value="1st Year">1st Year</NativeSelectOption>
-                  <NativeSelectOption value="2nd Year">2nd Year</NativeSelectOption>
-                  <NativeSelectOption value="3rd Year">3rd Year</NativeSelectOption>
-                  <NativeSelectOption value="4th Year">4th Year</NativeSelectOption>
-                </NativeSelect>
+                  <SelectTrigger id="post-year" className="w-full border-border text-xs rounded-lg">
+                    <SelectValue placeholder="Select Year" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="None/General" className="text-xs">None/General</SelectItem>
+                    <SelectItem value="1st Year" className="text-xs">1st Year</SelectItem>
+                    <SelectItem value="2nd Year" className="text-xs">2nd Year</SelectItem>
+                    <SelectItem value="3rd Year" className="text-xs">3rd Year</SelectItem>
+                    <SelectItem value="4th Year" className="text-xs">4th Year</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
@@ -677,7 +693,7 @@ export default function AskQuestionPage() {
               <Label className="text-sm font-bold text-foreground">
                 Tags (max 5)
               </Label>
-              <div className="flex flex-wrap gap-2 rounded-none border border-border bg-muted/20 p-3">
+              <div className="flex flex-wrap gap-2 rounded-lg border border-border bg-muted/20 p-3">
                 {AVAILABLE_TAGS.map((tag) => {
                   const isSelected = selectedTags.includes(tag)
                   return (
@@ -685,11 +701,7 @@ export default function AskQuestionPage() {
                       key={tag}
                       variant={isSelected ? "default" : "outline"}
                       onClick={() => handleTagToggle(tag)}
-                      className={`cursor-pointer rounded-none px-2.5 py-1 text-xs font-normal transition-colors ${
-                        isSelected
-                          ? "bg-blue-600 text-white hover:bg-blue-700"
-                          : "border-border text-muted-foreground hover:bg-blue-50 hover:text-blue-600"
-                      }`}
+                      className="cursor-pointer px-2.5 py-1 text-xs font-normal transition-colors"
                     >
                       {tag}
                     </Badge>
@@ -703,7 +715,7 @@ export default function AskQuestionPage() {
               <Button
                 onClick={handlePost}
                 disabled={isTitleEmpty || isContentEmpty || isPosting}
-                className="h-10 gap-1.5 rounded-none bg-blue-600 px-5 text-white hover:bg-blue-700"
+                className="h-10 gap-1.5 px-5"
               >
                 {isPosting ? (
                   <Spinner className="h-4 w-4" />
@@ -716,7 +728,7 @@ export default function AskQuestionPage() {
                 variant="outline"
                 onClick={handleSaveDraft}
                 disabled={hasNoContentToSave}
-                className="h-10 gap-1.5 rounded-none border-border transition-colors hover:bg-blue-50 hover:text-blue-600"
+                className="h-10 gap-1.5"
               >
                 <FloppyDiskIcon className="h-4 w-4" />
                 Save draft
@@ -728,7 +740,7 @@ export default function AskQuestionPage() {
         {/* Sidebar drafts */}
         <div className="space-y-4 lg:col-span-1">
           {/* Post Requirements Guide */}
-          <div className="space-y-3 rounded-none border border-border bg-card p-4">
+          <div className="space-y-3 border border-border bg-card p-4 rounded-lg">
             <h3 className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
               Post Requirements Guide
             </h3>
@@ -736,15 +748,17 @@ export default function AskQuestionPage() {
               {/* Requirement 1: Title */}
               <div className="flex items-center gap-2.5">
                 {!isTitleEmpty ? (
-                  <div className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-none bg-green-500/10 text-green-600 dark:text-green-400 border border-green-600/20">
+                  <div className="flex h-4.5 w-4.5 shrink-0 items-center justify-center border border-green-600/20 bg-green-500/10 text-green-600 dark:text-green-400 rounded-sm">
                     <CheckIcon className="h-3 w-3" weight="bold" />
                   </div>
                 ) : (
-                  <div className="h-4.5 w-4.5 shrink-0 border border-muted-foreground/30 rounded-none" />
+                  <div className="h-4.5 w-4.5 shrink-0 border border-muted-foreground/30 rounded-sm" />
                 )}
                 <span
                   className={`text-xs font-medium transition-colors ${
-                    !isTitleEmpty ? "text-green-600 dark:text-green-400" : "text-muted-foreground"
+                    !isTitleEmpty
+                      ? "text-green-600 dark:text-green-400"
+                      : "text-muted-foreground"
                   }`}
                 >
                   Provide a descriptive title
@@ -754,15 +768,17 @@ export default function AskQuestionPage() {
               {/* Requirement 2: Content */}
               <div className="flex items-center gap-2.5">
                 {!isContentEmpty ? (
-                  <div className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-none bg-green-500/10 text-green-600 dark:text-green-400 border border-green-600/20">
+                  <div className="flex h-4.5 w-4.5 shrink-0 items-center justify-center border border-green-600/20 bg-green-500/10 text-green-600 dark:text-green-400 rounded-sm">
                     <CheckIcon className="h-3 w-3" weight="bold" />
                   </div>
                 ) : (
-                  <div className="h-4.5 w-4.5 shrink-0 border border-muted-foreground/30 rounded-none" />
+                  <div className="h-4.5 w-4.5 shrink-0 border border-muted-foreground/30 rounded-sm" />
                 )}
                 <span
                   className={`text-xs font-medium transition-colors ${
-                    !isContentEmpty ? "text-green-600 dark:text-green-400" : "text-muted-foreground"
+                    !isContentEmpty
+                      ? "text-green-600 dark:text-green-400"
+                      : "text-muted-foreground"
                   }`}
                 >
                   {contentRequirementText}
@@ -776,7 +792,7 @@ export default function AskQuestionPage() {
           </h2>
           <div className="space-y-3">
             {drafts.length === 0 ? (
-              <p className="rounded-none border border-dashed border-border bg-muted/20 p-3 text-xs text-muted-foreground">
+              <p className="border border-dashed border-border bg-muted/20 p-3 text-xs text-muted-foreground rounded-lg">
                 No active drafts.
               </p>
             ) : (
@@ -784,9 +800,9 @@ export default function AskQuestionPage() {
                 <div
                   key={draft.id}
                   onClick={() => handleLoadDraft(draft)}
-                  className={`cursor-pointer rounded-none border p-3 text-left transition-all hover:bg-muted/40 ${
+                  className={`cursor-pointer border p-3 text-left rounded-lg transition-all hover:bg-muted/40 ${
                     activeDraftId === draft.id
-                      ? "border-blue-500 bg-blue-50/10"
+                      ? "border-primary bg-primary/5"
                       : "border-border bg-card"
                   }`}
                 >
@@ -796,6 +812,7 @@ export default function AskQuestionPage() {
                     </span>
                     <button
                       onClick={(e) => handleDeleteDraft(e, draft.id)}
+                      aria-label="Delete draft"
                       className="p-0.5 text-muted-foreground transition-colors hover:text-destructive"
                     >
                       <TrashIcon className="h-3.5 w-3.5" />

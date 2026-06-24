@@ -15,7 +15,7 @@ export default function ProfileRedirectPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-4 px-4 py-12 text-center">
       <p className="text-sm text-muted-foreground">
-        Redirecting to your profile...
+        Redirecting to your profile…
       </p>
     </div>
   )

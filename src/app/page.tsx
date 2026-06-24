@@ -51,16 +51,16 @@ export default function Dashboard() {
   if (!mounted) {
     return (
       <div className="mx-auto max-w-7xl animate-pulse space-y-8 px-4 py-6 sm:px-6">
-        <div className="h-6 w-48 rounded-none bg-muted" />
+        <div className="h-6 w-48 bg-muted" />
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 rounded-none bg-muted" />
+            <div key={i} className="h-32 bg-muted" />
           ))}
         </div>
-        <div className="h-10 w-full rounded-none bg-muted" />
+        <div className="h-10 w-full bg-muted" />
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-24 rounded-none bg-muted" />
+            <div key={i} className="h-24 bg-muted" />
           ))}
         </div>
       </div>
@@ -87,7 +87,7 @@ export default function Dashboard() {
     <div className="mx-auto max-w-7xl space-y-8 px-4 py-6 sm:px-6">
       {/* Featured Section */}
       <div>
-        <h2 className="mb-4 text-sm font-semibold tracking-wider text-muted-foreground uppercase">
+        <h2 className="mb-4 text-lg font-bold text-foreground">
           Featured Questions
         </h2>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -96,28 +96,28 @@ export default function Dashboard() {
             return (
               <Card
                 key={post.id}
-                className="flex flex-col justify-between rounded-none border-border transition-colors hover:border-blue-500/50"
+                className="flex flex-col justify-between border-border transition-colors hover:border-primary/50"
               >
                 <CardHeader className="p-4 pb-2">
                   <div className="mb-2 flex items-center justify-between">
                     {post.authorId !== "anonymous" ? (
                       <Link
                         href={`/profiles/${post.authorId}`}
-                        className="flex items-center gap-2 hover:text-blue-600 group"
+                        className="group flex items-center gap-2 hover:text-primary"
                       >
                         <Avatar className="h-6 w-6 cursor-pointer">
-                          <AvatarFallback className="bg-blue-100 text-[10px] text-blue-800">
+                          <AvatarFallback className="text-[10px]">
                             {post.authorAvatar}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="max-w-[120px] truncate text-xs font-medium text-muted-foreground group-hover:text-blue-600 group-hover:underline">
+                        <span className="max-w-[120px] truncate text-xs font-medium text-muted-foreground group-hover:text-primary group-hover:underline">
                           {post.authorName}
                         </span>
                       </Link>
                     ) : (
                       <div className="flex items-center gap-2">
                         <Avatar className="h-6 w-6">
-                          <AvatarFallback className="bg-blue-100 text-[10px] text-blue-800">
+                          <AvatarFallback className="text-[10px]">
                             {post.authorAvatar}
                           </AvatarFallback>
                         </Avatar>
@@ -128,12 +128,12 @@ export default function Dashboard() {
                     )}
                     <Badge
                       variant="secondary"
-                      className="border-none bg-blue-50 px-2 text-[10px] font-normal text-blue-700 hover:bg-blue-50"
+                      className="border-none px-2 text-[10px] font-normal"
                     >
                       {post.tags[0]}
                     </Badge>
                   </div>
-                  <CardTitle className="line-clamp-2 flex items-center gap-1.5 text-sm font-bold transition-colors hover:text-blue-600">
+                  <CardTitle className="line-clamp-2 flex items-center gap-1.5 text-sm font-bold transition-colors hover:text-primary">
                     {getPostTypeIcon(post.postType)}
                     <Link href={`/posts/${post.id}`}>{post.title}</Link>
                   </CardTitle>
@@ -142,7 +142,7 @@ export default function Dashboard() {
                   <span>{formatTimeAgo(post.timestamp)}</span>
                   <div className="flex items-center gap-3">
                     <span className="flex items-center gap-1 font-medium text-foreground">
-                      <ArrowUpIcon className="h-3.5 w-3.5 text-blue-600" />
+                      <ArrowUpIcon className="h-3.5 w-3.5 text-primary" />
                       {score}
                     </span>
                   </div>
@@ -155,7 +155,7 @@ export default function Dashboard() {
 
       {/* Main feed list */}
       <div className="space-y-4">
-        <div className="flex flex-col gap-4 border-b border-border pb-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-bold text-foreground">
             Recent Discussions
           </h2>
@@ -166,16 +166,10 @@ export default function Dashboard() {
             className="w-full sm:w-auto"
           >
             <TabsList className="grid h-9 w-full grid-cols-2 sm:w-[200px]">
-              <TabsTrigger
-                value="latest"
-                className="text-xs data-[state=active]:bg-blue-600 data-[state=active]:text-white"
-              >
+              <TabsTrigger value="latest" className="text-xs">
                 Latest
               </TabsTrigger>
-              <TabsTrigger
-                value="trending"
-                className="text-xs data-[state=active]:bg-blue-600 data-[state=active]:text-white"
-              >
+              <TabsTrigger value="trending" className="text-xs">
                 Trending
               </TabsTrigger>
             </TabsList>
@@ -183,7 +177,7 @@ export default function Dashboard() {
         </div>
 
         {/* Chronological feed post cards */}
-        <div className="divide-y divide-border overflow-hidden rounded-none border bg-card">
+        <div className="divide-y divide-border overflow-hidden rounded-lg border bg-card">
           {displayedPosts.length === 0 ? (
             <div className="p-8 text-center text-sm text-muted-foreground">
               No discussions found.
@@ -197,15 +191,16 @@ export default function Dashboard() {
                   className="flex flex-col gap-4 p-5 transition-colors hover:bg-muted/30 md:flex-row md:items-start"
                 >
                   {/* Scores Sidebar (Desktop) */}
-                  <div className="hidden min-w-[40px] flex-col items-center justify-center gap-1.5 rounded-none bg-transparent py-1 text-center md:flex">
+                  <div className="hidden min-w-[40px] flex-col items-center justify-center gap-1.5 bg-transparent py-1 text-center md:flex">
                     <Button
                       size="icon"
                       variant="ghost"
                       onClick={() => handleVote(post.id, "up", post.authorId)}
-                      className={`h-7 w-7 rounded-none ${
+                      aria-label="Upvote discussion"
+                      className={`size-7 ${
                         post.upvotes.includes(currentUserId)
-                          ? "bg-blue-50/50 text-blue-600"
-                          : "text-muted-foreground hover:text-blue-600"
+                          ? "bg-primary/10 text-primary"
+                          : "text-muted-foreground hover:text-primary"
                       }`}
                     >
                       <ArrowUpIcon
@@ -224,10 +219,11 @@ export default function Dashboard() {
                       size="icon"
                       variant="ghost"
                       onClick={() => handleVote(post.id, "down", post.authorId)}
-                      className={`h-7 w-7 rounded-none ${
+                      aria-label="Downvote discussion"
+                      className={`size-7 ${
                         post.downvotes.includes(currentUserId)
-                          ? "bg-red-50/50 text-red-600"
-                          : "text-muted-foreground hover:text-red-600"
+                          ? "bg-destructive/10 text-destructive"
+                          : "text-muted-foreground hover:text-destructive"
                       }`}
                     >
                       <ArrowDownIcon
@@ -247,21 +243,21 @@ export default function Dashboard() {
                       {post.authorId !== "anonymous" ? (
                         <Link
                           href={`/profiles/${post.authorId}`}
-                          className="flex items-center gap-2 hover:text-blue-600 group"
+                          className="group flex items-center gap-2 hover:text-primary"
                         >
                           <Avatar className="h-5 w-5 cursor-pointer">
-                            <AvatarFallback className="bg-blue-100 text-[8px] text-blue-800">
+                            <AvatarFallback className="text-[8px]">
                               {post.authorAvatar}
                             </AvatarFallback>
                           </Avatar>
-                          <span className="font-semibold text-foreground group-hover:text-blue-600 group-hover:underline">
+                          <span className="font-semibold text-foreground group-hover:text-primary group-hover:underline">
                             {post.authorName}
                           </span>
                         </Link>
                       ) : (
                         <>
                           <Avatar className="h-5 w-5">
-                            <AvatarFallback className="bg-blue-100 text-[8px] text-blue-800">
+                            <AvatarFallback className="text-[8px]">
                               {post.authorAvatar}
                             </AvatarFallback>
                           </Avatar>
@@ -275,7 +271,7 @@ export default function Dashboard() {
                       {post.isFeatured && (
                         <>
                           <span>•</span>
-                          <span className="inline-flex items-center gap-0.5 rounded-none bg-blue-50 px-1.5 py-0.5 text-[10px] font-bold text-blue-600">
+                          <span className="inline-flex items-center gap-0.5 rounded-sm bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary">
                             Featured
                           </span>
                         </>
@@ -283,7 +279,7 @@ export default function Dashboard() {
                     </div>
 
                     <Link href={`/posts/${post.id}`} className="group block">
-                      <h3 className="flex items-center gap-1.5 text-base font-bold text-foreground transition-colors group-hover:text-blue-600">
+                      <h3 className="flex items-center gap-1.5 text-base font-bold text-foreground transition-colors group-hover:text-primary">
                         {getPostTypeIcon(post.postType)}
                         {post.title}
                       </h3>
@@ -297,14 +293,16 @@ export default function Dashboard() {
                       <div className="flex flex-wrap items-center gap-1.5">
                         {post.authorDepartment && (
                           <Badge
-                            className="rounded-none bg-blue-50 text-blue-700 hover:bg-blue-50 border-none text-xs font-normal"
+                            variant="secondary"
+                            className="text-xs font-normal"
                           >
                             Dept: {post.authorDepartment}
                           </Badge>
                         )}
                         {post.authorYearOfStudy && (
                           <Badge
-                            className="rounded-none bg-purple-50 text-purple-700 hover:bg-purple-50 border-none text-xs font-normal"
+                            variant="outline"
+                            className="text-xs font-normal"
                           >
                             Year: {post.authorYearOfStudy}
                           </Badge>
@@ -313,7 +311,7 @@ export default function Dashboard() {
                           <Badge
                             key={tag}
                             variant="outline"
-                            className="border-border text-xs font-normal text-muted-foreground transition-colors hover:bg-blue-50 hover:text-blue-600"
+                            className="border-border text-xs font-normal text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
                           >
                             {tag}
                           </Badge>
@@ -322,16 +320,17 @@ export default function Dashboard() {
 
                       {/* Vote summary for mobile */}
                       <div className="flex items-center gap-3 text-xs text-muted-foreground md:hidden">
-                        <div className="flex h-7 items-center overflow-hidden rounded-none bg-transparent">
+                        <div className="flex h-7 items-center overflow-hidden bg-transparent">
                           <Button
                             size="icon"
                             variant="ghost"
                             onClick={() =>
                               handleVote(post.id, "up", post.authorId)
                             }
-                            className={`h-7 w-7 rounded-none ${
+                            aria-label="Upvote discussion"
+                            className={`size-7 ${
                               post.upvotes.includes(currentUserId)
-                                ? "bg-blue-50/50 text-blue-600"
+                                ? "bg-primary/10 text-primary"
                                 : "text-muted-foreground"
                             }`}
                           >
@@ -353,9 +352,10 @@ export default function Dashboard() {
                             onClick={() =>
                               handleVote(post.id, "down", post.authorId)
                             }
-                            className={`h-7 w-7 rounded-none ${
+                            aria-label="Downvote discussion"
+                            className={`size-7 ${
                               post.downvotes.includes(currentUserId)
-                                ? "bg-red-50/50 text-red-600"
+                                ? "bg-destructive/10 text-destructive"
                                 : "text-muted-foreground"
                             }`}
                           >
@@ -389,7 +389,7 @@ export default function Dashboard() {
               variant="outline"
               size="sm"
               onClick={() => setVisibleCount((prev) => prev + 5)}
-              className="rounded-none border-border transition-colors hover:bg-blue-50 hover:text-blue-600"
+              className="border-border"
             >
               Load more
             </Button>

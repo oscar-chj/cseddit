@@ -61,10 +61,10 @@ function SearchResultsContent() {
   if (!mounted) {
     return (
       <div className="mx-auto max-w-7xl animate-pulse space-y-6 px-4 py-6 sm:px-6">
-        <div className="h-6 w-64 rounded-none bg-muted" />
+        <div className="h-6 w-64 bg-muted" />
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-24 rounded-none bg-muted" />
+            <div key={i} className="h-24 bg-muted" />
           ))}
         </div>
       </div>
@@ -116,22 +116,22 @@ function SearchResultsContent() {
         <TabsList className="grid h-9 w-full grid-cols-2 sm:w-[320px]">
           <TabsTrigger
             value="posts"
-            className="text-xs data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+            className="text-xs"
           >
             Discussions ({filteredPosts.length})
           </TabsTrigger>
           <TabsTrigger
             value="users"
-            className="text-xs data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+            className="text-xs"
           >
             Profiles ({filteredUsers.length})
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="posts" className="mt-0">
-          <div className="divide-y divide-border overflow-hidden rounded-none border bg-card">
+          <div className="divide-y divide-border overflow-hidden border bg-card rounded-lg">
             {filteredPosts.length === 0 ? (
-              <div className="space-y-2 p-12 text-center">
+              <div className="space-y-2 border border-border bg-card rounded-lg p-12 text-center">
                 <p className="text-sm font-medium text-muted-foreground">
                   We couldn&apos;t find any matches.
                 </p>
@@ -143,7 +143,7 @@ function SearchResultsContent() {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="rounded-none border-border transition-colors hover:bg-blue-50 hover:text-blue-600"
+                      className="border-border transition-colors hover:bg-accent hover:text-accent-foreground"
                     >
                       Go back to Dashboard
                     </Button>
@@ -159,15 +159,16 @@ function SearchResultsContent() {
                     className="flex flex-col gap-4 p-5 transition-colors hover:bg-muted/30 md:flex-row md:items-start"
                   >
                     {/* Scores Sidebar (Desktop) */}
-                    <div className="hidden min-w-[40px] flex-col items-center justify-center gap-1.5 rounded-none bg-transparent py-1 text-center md:flex">
+                    <div className="hidden min-w-[40px] flex-col items-center justify-center gap-1.5 bg-transparent py-1 text-center md:flex">
                       <Button
                         size="icon"
                         variant="ghost"
                         onClick={() => handleVote(post.id, "up", post.authorId)}
-                        className={`h-7 w-7 rounded-none ${
+                        aria-label="Upvote discussion"
+                        className={`size-7 ${
                           post.upvotes.includes(currentUserId)
-                            ? "bg-blue-50/50 text-blue-600"
-                            : "text-muted-foreground hover:text-blue-600"
+                            ? "bg-primary/10 text-primary"
+                            : "text-muted-foreground hover:text-primary"
                         }`}
                       >
                         <ArrowUpIcon
@@ -185,11 +186,14 @@ function SearchResultsContent() {
                       <Button
                         size="icon"
                         variant="ghost"
-                        onClick={() => handleVote(post.id, "down", post.authorId)}
-                        className={`h-7 w-7 rounded-none ${
+                        onClick={() =>
+                          handleVote(post.id, "down", post.authorId)
+                        }
+                        aria-label="Downvote discussion"
+                        className={`size-7 ${
                           post.downvotes.includes(currentUserId)
-                            ? "bg-red-50/50 text-red-600"
-                            : "text-muted-foreground hover:text-red-600"
+                            ? "bg-destructive/10 text-destructive"
+                            : "text-muted-foreground hover:text-destructive"
                         }`}
                       >
                         <ArrowDownIcon
@@ -209,21 +213,21 @@ function SearchResultsContent() {
                         {post.authorId !== "anonymous" ? (
                           <Link
                             href={`/profiles/${post.authorId}`}
-                            className="flex items-center gap-2 hover:text-blue-600 group"
+                            className="group flex items-center gap-2 hover:text-primary"
                           >
                             <Avatar className="h-5 w-5 cursor-pointer">
-                              <AvatarFallback className="bg-blue-100 text-[8px] text-blue-800">
+                              <AvatarFallback className="text-[8px]">
                                 {post.authorAvatar}
                               </AvatarFallback>
                             </Avatar>
-                            <span className="font-semibold text-foreground group-hover:text-blue-600 group-hover:underline">
+                            <span className="font-semibold text-foreground group-hover:text-primary group-hover:underline">
                               {post.authorName}
                             </span>
                           </Link>
                         ) : (
                           <>
                             <Avatar className="h-5 w-5">
-                              <AvatarFallback className="bg-blue-100 text-[8px] text-blue-800">
+                              <AvatarFallback className="text-[8px]">
                                 {post.authorAvatar}
                               </AvatarFallback>
                             </Avatar>
@@ -237,7 +241,7 @@ function SearchResultsContent() {
                         {post.isFeatured && (
                           <>
                             <span>•</span>
-                            <span className="inline-flex items-center gap-0.5 rounded-none bg-blue-50 px-1.5 py-0.5 text-[10px] font-bold text-blue-600">
+                            <span className="inline-flex items-center gap-0.5 bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary rounded-sm">
                               Featured
                             </span>
                           </>
@@ -245,7 +249,7 @@ function SearchResultsContent() {
                       </div>
 
                       <Link href={`/posts/${post.id}`} className="group block">
-                        <h3 className="flex items-center gap-1.5 text-base font-bold text-foreground transition-colors group-hover:text-blue-600">
+                        <h3 className="flex items-center gap-1.5 text-base font-bold text-foreground transition-colors group-hover:text-primary">
                           {getPostTypeIcon(post.postType)}
                           {post.title}
                         </h3>
@@ -259,8 +263,8 @@ function SearchResultsContent() {
                         <div className="flex flex-wrap items-center gap-1.5">
                           {post.authorDepartment && (
                             <Badge
-                              variant="outline"
-                              className="rounded-none bg-blue-50 text-blue-700 hover:bg-blue-50 border-none text-xs font-normal"
+                              variant="secondary"
+                              className="border-none text-xs font-normal"
                             >
                               Dept: {post.authorDepartment}
                             </Badge>
@@ -268,7 +272,7 @@ function SearchResultsContent() {
                           {post.authorYearOfStudy && (
                             <Badge
                               variant="outline"
-                              className="rounded-none bg-purple-50 text-purple-700 hover:bg-purple-50 border-none text-xs font-normal"
+                              className="border-none text-xs font-normal"
                             >
                               Year: {post.authorYearOfStudy}
                             </Badge>
@@ -277,7 +281,7 @@ function SearchResultsContent() {
                             <Badge
                               key={tag}
                               variant="outline"
-                              className="border-border text-xs font-normal text-muted-foreground transition-colors hover:bg-blue-50 hover:text-blue-600"
+                              className="border-border text-xs font-normal text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
                             >
                               {tag}
                             </Badge>
@@ -286,16 +290,17 @@ function SearchResultsContent() {
 
                         {/* Vote summary for mobile */}
                         <div className="flex items-center gap-3 text-xs text-muted-foreground md:hidden">
-                          <div className="flex h-7 items-center overflow-hidden rounded-none bg-transparent">
+                          <div className="flex h-7 items-center overflow-hidden bg-transparent">
                             <Button
                               size="icon"
                               variant="ghost"
                               onClick={() =>
                                 handleVote(post.id, "up", post.authorId)
                               }
-                              className={`h-7 w-7 rounded-none ${
+                              aria-label="Upvote discussion"
+                              className={`size-7 ${
                                 post.upvotes.includes(currentUserId)
-                                  ? "bg-blue-50/50 text-blue-600"
+                                  ? "bg-primary/10 text-primary"
                                   : "text-muted-foreground"
                               }`}
                             >
@@ -317,9 +322,10 @@ function SearchResultsContent() {
                               onClick={() =>
                                 handleVote(post.id, "down", post.authorId)
                               }
-                              className={`h-7 w-7 rounded-none ${
+                              aria-label="Downvote discussion"
+                              className={`size-7 ${
                                 post.downvotes.includes(currentUserId)
-                                  ? "bg-red-50/50 text-red-600"
+                                  ? "bg-destructive/10 text-destructive"
                                   : "text-muted-foreground"
                               }`}
                             >
@@ -349,7 +355,7 @@ function SearchResultsContent() {
 
         <TabsContent value="users" className="mt-0">
           {filteredUsers.length === 0 ? (
-            <div className="rounded-none border border-border bg-card space-y-2 p-12 text-center">
+            <div className="space-y-2 border border-border bg-card rounded-lg p-12 text-center">
               <p className="text-sm font-medium text-muted-foreground">
                 We couldn&apos;t find any matching profiles.
               </p>
@@ -361,7 +367,7 @@ function SearchResultsContent() {
                   <Button
                     size="sm"
                     variant="outline"
-                    className="rounded-none border-border transition-colors hover:bg-blue-50 hover:text-blue-600"
+                    className="border-border transition-colors hover:bg-accent hover:text-accent-foreground"
                   >
                     Go back to Dashboard
                   </Button>
@@ -369,44 +375,44 @@ function SearchResultsContent() {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {filteredUsers.map((user) => (
                 <div
                   key={user.id}
-                  className="border border-border bg-card p-4 rounded-none hover:border-blue-500/50 transition-colors flex gap-4 items-start"
+                  className="flex items-start gap-4 border border-border bg-card rounded-lg p-4 transition-colors hover:border-primary/50"
                 >
-                  <Avatar className="h-10 w-10 flex shrink-0 items-center justify-center border border-border">
-                    <AvatarFallback className="bg-blue-100 text-lg font-semibold text-blue-800">
+                  <Avatar className="flex h-10 w-10 shrink-0 items-center justify-center border border-border">
+                    <AvatarFallback className="text-lg font-semibold">
                       {user.avatar}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="flex-1 space-y-2 min-w-0">
+                  <div className="min-w-0 flex-1 space-y-2">
                     <div>
                       <div className="flex flex-wrap items-baseline gap-1.5">
                         <Link
                           href={`/profiles/${user.id}`}
-                          className="hover:text-blue-600 font-bold text-sm transition-colors truncate"
+                          className="truncate text-sm font-bold transition-colors hover:text-primary"
                         >
                           {user.name}
                         </Link>
-                        <span className="text-xs text-muted-foreground truncate">
+                        <span className="truncate text-xs text-muted-foreground">
                           @{user.username}
                         </span>
                       </div>
-                      <p className="text-xs text-muted-foreground font-medium mt-0.5 truncate">
+                      <p className="mt-0.5 truncate text-xs font-medium text-muted-foreground">
                         {user.title}
                       </p>
                     </div>
 
-                    <p className="text-xs text-muted-foreground line-clamp-2">
+                    <p className="line-clamp-2 text-xs text-muted-foreground">
                       {user.bio}
                     </p>
 
                     <div className="flex flex-wrap gap-1.5 pt-1">
                       {user.department && (
                         <Badge
-                          variant="outline"
-                          className="rounded-none bg-blue-50 text-blue-700 hover:bg-blue-50 border-none text-xs font-normal"
+                          variant="secondary"
+                          className="border-none text-xs font-normal"
                         >
                           Dept: {user.department}
                         </Badge>
@@ -414,7 +420,7 @@ function SearchResultsContent() {
                       {user.yearOfStudy && (
                         <Badge
                           variant="outline"
-                          className="rounded-none bg-purple-50 text-purple-700 hover:bg-purple-50 border-none text-xs font-normal"
+                          className="text-xs font-normal"
                         >
                           Year: {user.yearOfStudy}
                         </Badge>
@@ -423,15 +429,27 @@ function SearchResultsContent() {
 
                     <div className="flex flex-wrap items-center gap-4 pt-1 text-xs text-muted-foreground">
                       <div className="flex items-center gap-1">
-                        <StarIcon className="h-4 w-4 text-blue-600" weight="fill" />
+                        <StarIcon
+                          className="h-4 w-4 text-primary"
+                          weight="fill"
+                        />
                         <span>
-                          Reputation: <strong className="text-foreground font-semibold">{user.reputation}</strong>
+                          Reputation:{" "}
+                          <strong className="font-semibold text-foreground">
+                            {user.reputation}
+                          </strong>
                         </span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <ThumbsUpIcon className="h-4 w-4 text-emerald-600" weight="fill" />
+                        <ThumbsUpIcon
+                          className="h-4 w-4 text-primary"
+                          weight="fill"
+                        />
                         <span>
-                          Likes: <strong className="text-foreground font-semibold">{user.likes}</strong>
+                          Likes:{" "}
+                          <strong className="font-semibold text-foreground">
+                            {user.likes}
+                          </strong>
                         </span>
                       </div>
                     </div>
@@ -451,10 +469,10 @@ export default function SearchResultsPage() {
     <Suspense
       fallback={
         <div className="mx-auto max-w-7xl animate-pulse space-y-6 px-4 py-6 sm:px-6">
-          <div className="h-6 w-64 rounded-none bg-muted" />
+          <div className="h-6 w-64 bg-muted" />
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-24 rounded-none bg-muted" />
+              <div key={i} className="h-24 bg-muted" />
             ))}
           </div>
         </div>

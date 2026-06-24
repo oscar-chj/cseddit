@@ -33,8 +33,8 @@ export default function LeaderboardPage() {
   if (!mounted) {
     return (
       <div className="mx-auto max-w-4xl animate-pulse space-y-6 px-4 py-6">
-        <div className="h-8 w-64 rounded-none bg-muted" />
-        <div className="h-48 rounded-none bg-muted" />
+        <div className="h-8 w-64 bg-muted" />
+        <div className="h-48 bg-muted" />
       </div>
     )
   }
@@ -156,7 +156,7 @@ export default function LeaderboardPage() {
       </div>
 
       {/* Rankings List/Table */}
-      <div className="overflow-hidden rounded-none border border-border bg-card">
+      <div className="overflow-hidden border border-border bg-card rounded-lg">
         {sortedUsers.length === 0 ? (
           <div className="p-8 text-center text-sm text-muted-foreground">
             No contributors found matching the selected filters.
@@ -175,7 +175,7 @@ export default function LeaderboardPage() {
                   {/* Left side: Rank + Avatar + Name + Title */}
                   <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
                     {/* Rank badge */}
-                    <div className="flex h-8 w-8 min-w-[32px] items-center justify-center rounded-none border border-border bg-muted">
+                    <div className="flex h-8 w-8 min-w-[32px] items-center justify-center border border-border bg-muted rounded-md">
                       {isFirst ? (
                         <TrophyIcon
                           className="h-4 w-4 text-yellow-500"
@@ -194,7 +194,7 @@ export default function LeaderboardPage() {
                     >
                       {/* Avatar */}
                       <Avatar className="flex h-10 w-10 items-center justify-center border border-border">
-                        <AvatarFallback className="bg-blue-50 text-lg font-semibold text-blue-800">
+                        <AvatarFallback className="text-lg font-semibold">
                           {user.avatar}
                         </AvatarFallback>
                       </Avatar>
@@ -202,11 +202,11 @@ export default function LeaderboardPage() {
                       {/* User details */}
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="truncate text-sm font-bold text-foreground transition-colors hover:text-blue-600">
+                          <span className="truncate text-sm font-bold text-foreground transition-colors hover:text-primary">
                             {user.name}
                           </span>
                           {isFirst && (
-                            <Badge className="rounded-none border-none bg-yellow-500 px-1.5 py-0 text-[9px] font-bold tracking-wide text-white uppercase hover:bg-yellow-600">
+                            <Badge className="border-none bg-yellow-500 px-1.5 py-0 text-[9px] font-bold tracking-wide text-white uppercase hover:bg-yellow-600">
                               Top Contributor
                             </Badge>
                           )}
@@ -216,14 +216,14 @@ export default function LeaderboardPage() {
                         </p>
                         <div className="mt-1 flex flex-wrap items-center gap-1.5">
                           <Badge
-                            variant="outline"
-                            className="rounded-none border-border px-1.5 py-0 text-[9px] font-medium text-muted-foreground"
+                            variant="secondary"
+                            className="px-1.5 py-0 text-[9px] font-medium"
                           >
                             Dept: {user.department}
                           </Badge>
                           <Badge
                             variant="outline"
-                            className="rounded-none border-border px-1.5 py-0 text-[9px] font-medium text-muted-foreground"
+                            className="border-border px-1.5 py-0 text-[9px] font-medium text-muted-foreground"
                           >
                             Year: {user.yearOfStudy}
                           </Badge>
@@ -235,12 +235,12 @@ export default function LeaderboardPage() {
                   {/* Right side: Stats value */}
                   <div className="flex items-center gap-4 text-right">
                     {sortBy === "likes" ? (
-                      <div className="flex items-center gap-1.5 text-emerald-600">
+                      <div className="flex items-center gap-1.5 text-primary">
                         <ThumbsUpIcon className="h-4 w-4" weight="fill" />
                         <span className="text-sm font-bold">{user.likes}</span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-1.5 text-blue-600">
+                      <div className="flex items-center gap-1.5 text-primary">
                         <StarIcon className="h-4 w-4" weight="fill" />
                         <span className="text-sm font-bold">
                           {user.reputation}
