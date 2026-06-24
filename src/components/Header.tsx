@@ -60,9 +60,9 @@ export default function Header() {
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
           <div className="flex items-center gap-6">
-            <span className="text-lg font-bold text-blue-600">CSeddit</span>
+            <span className="text-lg font-bold text-primary">CSeddit</span>
           </div>
-          <div className="h-8 w-8 animate-pulse rounded-none bg-muted" />
+          <div className="h-8 w-8 animate-pulse bg-muted" />
         </div>
       </header>
     )
@@ -74,25 +74,25 @@ export default function Header() {
         {/* Brand & Left Navigation */}
         <div className="flex items-center gap-6 md:gap-8">
           <Link href="/" className="flex items-center gap-2">
-            <ChatsIcon className="h-6 w-6 text-blue-600" weight="fill" />
-            <span className="hidden text-xl font-extrabold tracking-tight text-blue-600 sm:inline">
+            <ChatsIcon className="h-6 w-6 text-primary" weight="fill" />
+            <span className="hidden text-xl font-extrabold tracking-tight text-primary sm:inline">
               CSeddit
             </span>
           </Link>
           <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
             <Link
               href="/"
-              className={`transition-colors hover:text-blue-600 ${
-                pathname === "/" ? "text-blue-600" : "text-muted-foreground"
+              className={`transition-colors hover:text-primary ${
+                pathname === "/" ? "text-primary font-semibold" : "text-muted-foreground"
               }`}
             >
               Dashboard
             </Link>
             <Link
               href="/leaderboard"
-              className={`flex items-center gap-1 transition-colors hover:text-blue-600 ${
+              className={`flex items-center gap-1 transition-colors hover:text-primary ${
                 pathname === "/leaderboard"
-                  ? "text-blue-600"
+                  ? "text-primary font-semibold"
                   : "text-muted-foreground"
               }`}
             >
@@ -111,58 +111,62 @@ export default function Header() {
             <MagnifyingGlassIcon className="absolute left-3 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search discussions..."
+              placeholder="Search discussions…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-9 w-full rounded-none border-muted bg-muted/50 pl-9 pr-14 focus-visible:ring-blue-500"
+              className="h-9 w-full border border-muted-foreground/50 bg-background/50 pr-14 pl-9 focus-visible:border-ring focus-visible:ring-ring"
+              aria-label="Search discussions"
             />
             {searchQuery.trim() !== "" && (
-              <div className="absolute right-3 hidden items-center text-[9px] font-mono text-muted-foreground border border-border px-1 py-0.5 rounded-none bg-background select-none pointer-events-none sm:flex">
+              <div className="pointer-events-none absolute right-3 hidden items-center border border-border bg-background px-1 py-0.5 font-mono text-[9px] text-muted-foreground select-none sm:flex">
                 ↵ Enter
               </div>
             )}
           </div>
         </form>
-
+ 
         {/* Right Controls */}
         <div className="flex items-center gap-3 sm:gap-4">
-          <Link href="/create">
-            <Button
-              size="sm"
-              className="flex gap-1 rounded-none bg-blue-600 text-white hover:bg-blue-700"
-            >
+          <Button
+            size="sm"
+            className="flex gap-1"
+            asChild
+          >
+            <Link href="/create">
               <PlusIcon className="h-4 w-4" weight="bold" />
               <span className="hidden sm:inline">Ask Question</span>
-            </Button>
-          </Link>
-
+            </Link>
+          </Button>
+ 
           {/* Leaderboard Icon (Mobile only) */}
-          <Link href="/leaderboard" className="md:hidden">
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-9 w-9 rounded-none"
-            >
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-9 w-9 md:hidden"
+            aria-label="View Leaderboard"
+            asChild
+          >
+            <Link href="/leaderboard">
               <TrophyIcon className="h-5 w-5 text-muted-foreground" />
-            </Button>
-          </Link>
-
+            </Link>
+          </Button>
+ 
           {/* Switchable User Dropdown Switcher */}
           {currentUser && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="relative h-9 w-9 rounded-none border border-muted/50 p-0"
+                  className="relative h-9 w-9 border border-border p-0"
                 >
                   <Avatar className="flex h-8 w-8 items-center justify-center">
-                    <AvatarFallback className="bg-blue-100 text-base font-semibold text-blue-800">
+                    <AvatarFallback className="text-base font-semibold">
                       {currentUser.avatar}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 rounded-none">
+              <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">
                   Logged in as
                 </DropdownMenuLabel>
@@ -203,7 +207,7 @@ export default function Header() {
                       <span>{user.name}</span>
                     </div>
                     {user.id === currentUser.id && (
-                      <span className="h-1.5 w-1.5 rounded-none bg-blue-500" />
+                      <span className="h-1.5 w-1.5 bg-primary" />
                     )}
                   </DropdownMenuItem>
                 ))}
